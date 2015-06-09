@@ -1,0 +1,45 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:panelGrid id="pgrid-fato" columns="3">
+        <p:selectOneMenu value="#{fatoBean.cdFatoSelecionado}"
+                         style="width: 230px">
+            <f:selectItem itemLabel="Selecione uma informação"
+                          noSelectionOption="true"/>
+            <f:selectItems value="#{fatoBean.listaFato}"
+                           var="fato"
+                           itemLabel="#{fato.dsFato}"
+                           itemValue="#{fato.cdFato}"/>
+        </p:selectOneMenu>
+        <h:commandButton image="/resources/images/green-add-32.png" 
+                         title="Adicionar">
+            <f:ajax event="click" 
+                    execute="pgrid-fato"
+                    listener="#{fatoBean.addFatoSelecionado()}"
+                    render=":form-message:growl-message pgrid-fato pgroup-fato-sel"/>
+        </h:commandButton>
+        <h:commandButton image="/resources/images/calculator-32.png" 
+                         title="Calcular"/>
+    </h:panelGrid>
+    <h:panelGroup id="pgroup-fato-sel">
+        <p:dataTable value="#{fatoBean.listaFatoSelecionado}" 
+                     var="fatoSel"
+                     rendered="#{not empty fatoBean.listaFatoSelecionado}">
+            <p:column style="font-weight: bold">
+                <f:facet name="header">
+                    <h:outputText value="Informação Selecionada"/>
+                </f:facet>
+                <h:outputText value="#{fatoSel.dsFato}"/>
+                <h:commandLink value="Remover" style="float: right">
+                    <f:param name="cdFatoSelecionado" value="#{fatoSel.cdFato}"/>
+                    <f:ajax event="click" 
+                            execute=":form-filter:pgroup-fato-sel"
+                            listener="#{fatoBean.removeFatoSelecionado()}"
+                            render=":form-message:growl-message :form-filter:pgrid-fato :form-filter:pgroup-fato-sel"/>
+                </h:commandLink>
+            </p:column>
+        </p:dataTable>
+    </h:panelGroup>
+</ui:composition>

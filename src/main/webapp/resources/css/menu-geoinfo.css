@@ -1,0 +1,51 @@
+.icon-import-data-16{
+    height: 16px;
+    width: 16px;
+    background-image: url("#{resource['images/import-data-16.png']}") !important;
+}
+
+.icon-user-group-16{
+    height: 16px;
+    width: 16px;
+    background-image: url("#{resource['images/user-group-16.png']}") !important;
+}
+
+.otext-logo{
+    position: absolute; 
+    top: 0px; 
+    left: 15px; 
+    font-family: "Tahoma";
+    font-size: 3em;
+    color: rgba(0,0,255,0.5);
+}
+
+.otext-slogan{
+    position: absolute; 
+    top: 38px; 
+    left: 18px; 
+    font-family: "Tahoma";
+    font-size: 0.9em;
+}
+
+.menubar{
+    left: 190px; 
+    width: calc(100% - 200px); 
+    height: 40px;
+}
+
+.menuitem{
+    font-family: "Tahoma";
+    font-size: 1.5em;
+}
+
+.ui-submenu-link{
+    font-family: "Tahoma";
+    font-size: 1.5em;
+}
+
+.panelLogin{
+    position: absolute; 
+    left: calc(100% - 245px); 
+    top: 40px;
+}
+

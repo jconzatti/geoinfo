@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>GeoInfo&reg;</title>
+        <link rel="stylesheet" href="http://openlayers.org/en/v3.0.0/css/ol.css" type="text/css"/>
+        <script src="http://openlayers.org/en/v3.0.0/build/ol.js" type="text/javascript"/>
+        <ui:insert name="html-head"/>
+    </h:head>
+    <h:body>
+        <h:outputStylesheet name="template.css" library="css"/>
+        
+        <h:form id="form-message">
+            <p:growl id="growl-message"/>
+        </h:form>
+        
+        <p:layout fullPage="true" 
+                  widgetVar="layoutPage">
+            <p:layoutUnit position="north"
+                          size="52">
+                <ui:insert name="menu-geoinfo"/>     
+            </p:layoutUnit>
+            <p:layoutUnit position="west" 
+                          size="325" 
+                          collapsible="true" 
+                          resizable="true"
+                          header="Filtro"
+                          rendered="#{not empty sessionScope.pessoaLogada}">
+                <ui:insert name="filter-geoinfo"/>
+            </p:layoutUnit>
+            <p:layoutUnit position="east" 
+                          size="350" 
+                          collapsible="true" 
+                          resizable="true"
+                          header="Análise"
+                          collapsed="true"
+                          visible="false"
+                          rendered="#{not empty sessionScope.pessoaLogada}">
+                <ui:insert name="analize-geoinfo"/>
+            </p:layoutUnit>
+            <p:layoutUnit position="center">
+                <h:form id="form-map">
+                    <p:panel id="panel-titulo-map"
+                             style="background-color: #ddd;"
+                             rendered="#{not empty mapBuilderBean.dsTitulo}">
+                        <b><h:outputText value="#{mapBuilderBean.dsTitulo}" style="color: #000;"/></b>
+                    </p:panel>
+                    <div id="map" class="map">
+                        <div id="popup" class="ol-popup">
+                            <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+                            <div id="popup-content"></div>
+                        </div>
+                    </div>
+                </h:form>
+            </p:layoutUnit>
+        </p:layout>
+        
+        <h:form id="form-script-map">
+            <h:outputScript>
+                #{mapBuilderBean.dsOutputScriptMap}
+            </h:outputScript>
+        </h:form>
+    </h:body>
+</html>
+

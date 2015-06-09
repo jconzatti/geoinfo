@@ -1,0 +1,216 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:form id="form-analize">
+        <p:tabView widgetVar="tviewPrincipal">
+            <p:tab title="Resumo">
+                <p:tabView widgetVar="tviewResumo">
+                    <p:tab title="Países">
+                        <ui:repeat value="#{mapBuilderBean.listaObjetoFatoPais}" var="ofPais">
+                            <p:panel header="Resumo do(a) #{ofPais.fato.dsFato}" toggleable="true">
+                                <b><h:outputText value="#{ofPais.objetoFatoPeriodoA.periodoIntervalo}"/></b>
+                                <h:panelGrid columns="2">
+                                    <h:outputLabel value="País com Maior Valor: "/>
+                                    <h:outputText value="#{ofPais.objetoFatoPeriodoA.dsMaximo} (#{ofPais.fato.getFormatedValue(ofPais.objetoFatoPeriodoA.vlMaximo)} #{ofPais.fato.dsUnidade}s)"/>
+                                    <h:outputLabel value="País com Menor Valor: "/>
+                                    <h:outputText value="#{ofPais.objetoFatoPeriodoA.dsMinimo} (#{ofPais.fato.getFormatedValue(ofPais.objetoFatoPeriodoA.vlMinimo)} #{ofPais.fato.dsUnidade}s)"/>
+                                    <h:outputLabel value="Valor Total: "/>
+                                    <h:outputText value="#{ofPais.fato.getFormatedValue(ofPais.objetoFatoPeriodoA.vlTotal)} #{ofPais.fato.dsUnidade}s"/>
+                                    <h:outputLabel value="Valor Médio por País: "/>
+                                    <h:outputText value="#{ofPais.fato.getFormatedValue(ofPais.objetoFatoPeriodoA.vlMedio)} #{ofPais.fato.dsUnidade}s"/>
+                                    <h:outputLabel value="Quantidade de Países: "/>
+                                    <h:outputText value="#{ofPais.objetoFatoPeriodoA.qtFato} país(es)"/>
+                                </h:panelGrid>
+                                <b><h:outputText value="#{ofPais.objetoFatoPeriodoB.periodoIntervalo}" rendered="#{not empty ofPais.objetoFatoPeriodoB}"/></b>
+                                <h:panelGrid columns="2" rendered="#{not empty ofPais.objetoFatoPeriodoB}">
+                                    <h:outputLabel value="País com Maior Valor: "/>
+                                    <h:outputText value="#{ofPais.objetoFatoPeriodoB.dsMaximo} (#{ofPais.fato.getFormatedValue(ofPais.objetoFatoPeriodoB.vlMaximo)} #{ofPais.fato.dsUnidade}s)"/>
+                                    <h:outputLabel value="País com Menor Valor: "/>
+                                    <h:outputText value="#{ofPais.objetoFatoPeriodoB.dsMinimo} (#{ofPais.fato.getFormatedValue(ofPais.objetoFatoPeriodoB.vlMinimo)} #{ofPais.fato.dsUnidade}s)"/>
+                                    <h:outputLabel value="Valor Total: "/>
+                                    <h:outputText value="#{ofPais.fato.getFormatedValue(ofPais.objetoFatoPeriodoB.vlTotal)} #{ofPais.fato.dsUnidade}s"/>
+                                    <h:outputLabel value="Valor Médio por País: "/>
+                                    <h:outputText value="#{ofPais.fato.getFormatedValue(ofPais.objetoFatoPeriodoB.vlMedio)} #{ofPais.fato.dsUnidade}s"/>
+                                    <h:outputLabel value="Quantidade de Países: "/>
+                                    <h:outputText value="#{ofPais.objetoFatoPeriodoB.qtFato} país(es)"/>
+                                </h:panelGrid>
+                            </p:panel>
+                        </ui:repeat>
+                    </p:tab>
+                    <p:tab title="Estados">
+                        <ui:repeat value="#{mapBuilderBean.listaObjetoFatoEstado}" var="ofEstado">
+                            <p:panel header="Resumo do(a) #{ofEstado.fato.dsFato}" toggleable="true">
+                                <b><h:outputText value="#{ofEstado.objetoFatoPeriodoA.periodoIntervalo}"/></b>
+                                <h:panelGrid columns="2">
+                                    <h:outputLabel value="Estado com Maior Valor: "/>
+                                    <h:outputText value="#{ofEstado.objetoFatoPeriodoA.dsMaximo} (#{ofEstado.fato.getFormatedValue(ofEstado.objetoFatoPeriodoA.vlMaximo)} #{ofEstado.fato.dsUnidade}s)"/>
+                                    <h:outputLabel value="Estado com Menor Valor: "/>
+                                    <h:outputText value="#{ofEstado.objetoFatoPeriodoA.dsMinimo} (#{ofEstado.fato.getFormatedValue(ofEstado.objetoFatoPeriodoA.vlMinimo)} #{ofEstado.fato.dsUnidade}s)"/>
+                                    <h:outputLabel value="Valor Total: "/>
+                                    <h:outputText value="#{ofEstado.fato.getFormatedValue(ofEstado.objetoFatoPeriodoA.vlTotal)} #{ofEstado.fato.dsUnidade}s"/>
+                                    <h:outputLabel value="Valor Médio por Estado: "/>
+                                    <h:outputText value="#{ofEstado.fato.getFormatedValue(ofEstado.objetoFatoPeriodoA.vlMedio)} #{ofEstado.fato.dsUnidade}s"/>
+                                    <h:outputLabel value="Quantidade de Estados: "/>
+                                    <h:outputText value="#{ofEstado.objetoFatoPeriodoA.qtFato} estado(s)"/>
+                                </h:panelGrid>
+                                <b><h:outputText value="#{ofEstado.objetoFatoPeriodoB.periodoIntervalo}" rendered="#{not empty ofEstado.objetoFatoPeriodoB}"/></b>
+                                <h:panelGrid columns="2" rendered="#{not empty ofEstado.objetoFatoPeriodoB}">
+                                    <h:outputLabel value="Estado com Maior Valor: "/>
+                                    <h:outputText value="#{ofEstado.objetoFatoPeriodoB.dsMaximo} (#{ofEstado.fato.getFormatedValue(ofEstado.objetoFatoPeriodoB.vlMaximo)} #{ofEstado.fato.dsUnidade}s)"/>
+                                    <h:outputLabel value="Estado com Menor Valor: "/>
+                                    <h:outputText value="#{ofEstado.objetoFatoPeriodoB.dsMinimo} (#{ofEstado.fato.getFormatedValue(ofEstado.objetoFatoPeriodoB.vlMinimo)} #{ofEstado.fato.dsUnidade}s)"/>
+                                    <h:outputLabel value="Valor Total: "/>
+                                    <h:outputText value="#{ofEstado.fato.getFormatedValue(ofEstado.objetoFatoPeriodoB.vlTotal)} #{ofEstado.fato.dsUnidade}s"/>
+                                    <h:outputLabel value="Valor Médio por Estado: "/>
+                                    <h:outputText value="#{ofEstado.fato.getFormatedValue(ofEstado.objetoFatoPeriodoB.vlMedio)} #{ofEstado.fato.dsUnidade}s"/>
+                                    <h:outputLabel value="Quantidade de Estados: "/>
+                                    <h:outputText value="#{ofEstado.objetoFatoPeriodoB.qtFato} estado(s)"/>
+                                </h:panelGrid>
+                            </p:panel>
+                        </ui:repeat>
+                    </p:tab>
+                    <p:tab title="Cidades">
+                        <ui:repeat value="#{mapBuilderBean.listaObjetoFatoCidade}" var="ofCidade">
+                            <p:panel header="Resumo do(a) #{ofCidade.fato.dsFato}" toggleable="true">
+                                <b><h:outputText value="#{ofCidade.objetoFatoPeriodoA.periodoIntervalo}"/></b>
+                                <h:panelGrid columns="2">
+                                    <h:outputLabel value="Cidade com Maior Valor: "/>
+                                    <h:outputText value="#{ofCidade.objetoFatoPeriodoA.dsMaximo} (#{ofCidade.fato.getFormatedValue(ofCidade.objetoFatoPeriodoA.vlMaximo)} #{ofCidade.fato.dsUnidade}s)"/>
+                                    <h:outputLabel value="Cidade com Menor Valor: "/>
+                                    <h:outputText value="#{ofCidade.objetoFatoPeriodoA.dsMinimo} (#{ofCidade.fato.getFormatedValue(ofCidade.objetoFatoPeriodoA.vlMinimo)} #{ofCidade.fato.dsUnidade}s)"/>
+                                    <h:outputLabel value="Valor Total: "/>
+                                    <h:outputText value="#{ofCidade.fato.getFormatedValue(ofCidade.objetoFatoPeriodoA.vlTotal)} #{ofCidade.fato.dsUnidade}s"/>
+                                    <h:outputLabel value="Valor Médio por Cidade: "/>
+                                    <h:outputText value="#{ofCidade.fato.getFormatedValue(ofCidade.objetoFatoPeriodoA.vlMedio)} #{ofCidade.fato.dsUnidade}s"/>
+                                    <h:outputLabel value="Quantidade de Cidades: "/>
+                                    <h:outputText value="#{ofCidade.objetoFatoPeriodoA.qtFato} cidade(s)"/>
+                                </h:panelGrid>
+                                <b><h:outputText value="#{ofCidade.objetoFatoPeriodoB.periodoIntervalo}" rendered="#{not empty ofCidade.objetoFatoPeriodoB}"/></b>
+                                <h:panelGrid columns="2" rendered="#{not empty ofCidade.objetoFatoPeriodoB}">
+                                    <h:outputLabel value="Cidade com Maior Valor: "/>
+                                    <h:outputText value="#{ofCidade.objetoFatoPeriodoB.dsMaximo} (#{ofCidade.fato.getFormatedValue(ofCidade.objetoFatoPeriodoB.vlMaximo)} #{ofCidade.fato.dsUnidade}s)"/>
+                                    <h:outputLabel value="Cidade com Menor Valor: "/>
+                                    <h:outputText value="#{ofCidade.objetoFatoPeriodoB.dsMinimo} (#{ofCidade.fato.getFormatedValue(ofCidade.objetoFatoPeriodoB.vlMinimo)} #{ofCidade.fato.dsUnidade}s)"/>
+                                    <h:outputLabel value="Valor Total: "/>
+                                    <h:outputText value="#{ofCidade.fato.getFormatedValue(ofCidade.objetoFatoPeriodoB.vlTotal)} #{ofCidade.fato.dsUnidade}s"/>
+                                    <h:outputLabel value="Valor Médio por Cidade: "/>
+                                    <h:outputText value="#{ofCidade.fato.getFormatedValue(ofCidade.objetoFatoPeriodoB.vlMedio)} #{ofCidade.fato.dsUnidade}s"/>
+                                    <h:outputLabel value="Quantidade de Cidades: "/>
+                                    <h:outputText value="#{ofCidade.objetoFatoPeriodoB.qtFato} cidade(s)"/>
+                                </h:panelGrid>
+                            </p:panel>
+                        </ui:repeat>
+                    </p:tab>
+                </p:tabView>
+            </p:tab>
+            <p:tab title="Detalhe">
+                <p:tabView widgetVar="tviewDetalhe">
+                    <p:tab title="Países">
+                        <ui:repeat value="#{mapBuilderBean.listaObjetoFatoPais}" var="ofPais">
+                            <p:dataTable var="pais" 
+                                         value="#{mapBuilderBean.listaPais}"
+                                         scrollable="true"
+                                         scrollHeight="200"
+                                         scrollRows="10"
+                                         liveScroll="true"
+                                         sortBy="#{ofPais.objetoFatoPeriodoA.getVlItem(pais)}"
+                                         sortOrder="descending">
+                                <f:facet name="header">
+                                    #{ofPais.fato.dsFato}
+                                </f:facet>
+                                
+                                <p:column headerText="País" 
+                                          sortBy="#{pais.dsPais}">
+                                    <h:outputText value="#{pais}" />
+                                </p:column>
+                                
+                                <p:column headerText="#{ofPais.objetoFatoPeriodoA.periodoIntervalo}" 
+                                          sortBy="#{ofPais.objetoFatoPeriodoA.getVlItem(pais)}">
+                                    <h:outputText value="#{ofPais.fato.getFormatedValue(ofPais.objetoFatoPeriodoA.getVlItem(pais))}"
+                                                  style="float: right"/>
+                                </p:column>
+                                
+                                <p:column headerText="#{ofPais.objetoFatoPeriodoB.periodoIntervalo}" 
+                                          sortBy="#{ofPais.objetoFatoPeriodoB.getVlItem(pais)}"
+                                          rendered="#{not empty ofPais.objetoFatoPeriodoB}">
+                                    <h:outputText value="#{ofPais.fato.getFormatedValue(ofPais.objetoFatoPeriodoB.getVlItem(pais))}"
+                                                  style="float: right"/>
+                                </p:column>
+                            </p:dataTable>
+                        </ui:repeat>
+                    </p:tab>
+                    <p:tab title="Estados">
+                        <ui:repeat value="#{mapBuilderBean.listaObjetoFatoEstado}" var="ofEstado">
+                            <p:dataTable var="estado" 
+                                         value="#{mapBuilderBean.listaEstado}"
+                                         scrollable="true"
+                                         scrollHeight="200"
+                                         scrollRows="10"
+                                         liveScroll="true"
+                                         sortBy="#{ofEstado.objetoFatoPeriodoA.getVlItem(estado)}"
+                                         sortOrder="descending">
+                                <f:facet name="header">
+                                    #{ofEstado.fato.dsFato}
+                                </f:facet>
+                                
+                                <p:column headerText="Estado" 
+                                          sortBy="#{estado.dsEstado}">
+                                    <h:outputText value="#{estado}" />
+                                </p:column>
+                                
+                                <p:column headerText="#{ofEstado.objetoFatoPeriodoA.periodoIntervalo}" 
+                                          sortBy="#{ofEstado.objetoFatoPeriodoA.getVlItem(estado)}">
+                                    <h:outputText value="#{ofEstado.fato.getFormatedValue(ofEstado.objetoFatoPeriodoA.getVlItem(estado))}"
+                                                  style="float: right"/>
+                                </p:column>
+                                
+                                <p:column headerText="#{ofEstado.objetoFatoPeriodoB.periodoIntervalo}" 
+                                          sortBy="#{ofEstado.objetoFatoPeriodoB.getVlItem(estado)}"
+                                          rendered="#{not empty ofEstado.objetoFatoPeriodoB}">
+                                    <h:outputText value="#{ofEstado.fato.getFormatedValue(ofEstado.objetoFatoPeriodoB.getVlItem(estado))}"
+                                                  style="float: right"/>
+                                </p:column>
+                            </p:dataTable>
+                        </ui:repeat>
+                    </p:tab>
+                    <p:tab title="Cidades">
+                        <ui:repeat value="#{mapBuilderBean.listaObjetoFatoCidade}" var="ofCidade">
+                            <p:dataTable var="cidade" 
+                                         value="#{mapBuilderBean.listaCidade}"
+                                         scrollable="true"
+                                         scrollHeight="200"
+                                         scrollRows="10"
+                                         liveScroll="true"
+                                         sortBy="#{ofCidade.objetoFatoPeriodoA.getVlItem(cidade)}"
+                                         sortOrder="descending">
+                                <f:facet name="header">
+                                    #{ofCidade.fato.dsFato}
+                                </f:facet>
+                                
+                                <p:column headerText="Cidade" 
+                                          sortBy="#{cidade.dsCidade}">
+                                    <h:outputText value="#{cidade}" />
+                                </p:column>
+                                
+                                <p:column headerText="#{ofCidade.objetoFatoPeriodoA.periodoIntervalo}" 
+                                          sortBy="#{ofCidade.objetoFatoPeriodoA.getVlItem(cidade)}">
+                                    <h:outputText value="#{ofCidade.fato.getFormatedValue(ofCidade.objetoFatoPeriodoA.getVlItem(cidade))}"
+                                                  style="float: right"/>
+                                </p:column>
+                                
+                                <p:column headerText="#{ofCidade.objetoFatoPeriodoB.periodoIntervalo}" 
+                                          sortBy="#{ofCidade.objetoFatoPeriodoB.getVlItem(cidade)}"
+                                          rendered="#{not empty ofCidade.objetoFatoPeriodoB}">
+                                    <h:outputText value="#{ofCidade.fato.getFormatedValue(ofCidade.objetoFatoPeriodoB.getVlItem(cidade))}"
+                                                  style="float: right"/>
+                                </p:column>
+                            </p:dataTable>
+                        </ui:repeat>
+                    </p:tab>
+                </p:tabView>
+            </p:tab>
+        </p:tabView>
+    </h:form>            
+</ui:composition>

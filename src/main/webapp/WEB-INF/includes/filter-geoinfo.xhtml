@@ -1,0 +1,154 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html">
+    <h:outputStylesheet name="filter-geoinfo.css" library="css"/>
+    
+    <h:outputScript>
+        var inProcessMap = false;
+        function onProcessMap(data){
+            if(data.status === "begin"){
+                PF('dlgMapLoad').show();
+            }else if(data.status === "success"){
+                PF('dlgMapLoad').hide();
+                if(inProcessMap){
+                    PF('layoutPage').toggle('west');
+                    PF('layoutPage').show('east');
+                    PF('layoutPage').toggle('east');
+                }
+                if(inPollImportDataIniciado){
+                    PF('pollImportData').start();
+                }
+            }
+        }
+    </h:outputScript>
+       
+    <h:form id="form-filter">
+        <p:panelMenu>
+            <p:submenu label="Informação (O que?)">
+                <p:menuitem>
+                    <ui:include src="/WEB-INF/includes/filter-info-geoinfo.xhtml"/>
+                </p:menuitem>
+            </p:submenu>
+            <p:submenu label="Período (Quando?)">
+                <p:menuitem>
+                    <ui:include src="/WEB-INF/includes/filter-time-geoinfo.xhtml"/>
+                </p:menuitem>
+            </p:submenu>
+            <p:submenu label="Localização (Onde?)">
+                <p:menuitem>
+                    <h:outputText value="Filtre a região desejada"/>
+                </p:menuitem>
+            </p:submenu>
+        </p:panelMenu> 
+        <p:commandButton icon="icon-green-check-16" 
+                         iconPos="left" 
+                         value="Aplicar"  
+                         style="float: right; height: 32px; width: 90px; margin-top: 2px;">
+            <f:ajax listener="#{fatoBean.registrar()}" 
+                    execute="@none" 
+                    render=":form-message:growl-message"/>
+            <f:ajax listener="#{periodoBean.registrar()}" 
+                    execute="@none" 
+                    render=":form-message:growl-message"/>
+            <f:ajax listener="#{mapBuilderBean.processar()}" 
+                    execute=":form-filter" 
+                    render=":form-script-map :form-map :form-menu :form-analize :form-legenda :form-message:growl-message :form-map-load" 
+                    onevent="onProcessMap"/>
+        </p:commandButton>
+    </h:form>
+    
+    <h:form id="form-map-load">
+        <p:dialog appendTo="@(body)"
+                  resizable="false"
+                  closable="false"
+                  modal="true"
+                  widgetVar="dlgMapLoad"
+                  header="Carregando informações do Mapa. Aguarde!"
+                  onShow="PF('pollMapLoad').start();"
+                  onHide="PF('pollMapLoad').stop();">
+            <p:poll autoStart="false" interval="1" update=":form-map-load:pbar-map-load :form-map-load:pgrid-map-load" widgetVar="pollMapLoad"/>
+            <h:panelGrid columns="2" id="pgrid-map-load">
+                <h:panelGroup>
+                    <h:inputHidden rendered="#{mapBuilderBean.idProgressoPais == 0}"/>
+                    <h:graphicImage name="ajax-loading-16.gif" library="images" rendered="#{mapBuilderBean.idProgressoPais == 1}"/>
+                    <h:graphicImage name="green-check-16.png" library="images" rendered="#{mapBuilderBean.idProgressoPais == 2}"/>
+                    <h:graphicImage name="red-cancel-16.png" library="images" rendered="#{mapBuilderBean.idProgressoPais == 3}"/>
+                </h:panelGroup>
+                <h:outputText value="Carregando Países!"/>
+                
+                <h:panelGroup>
+                    <h:inputHidden rendered="#{mapBuilderBean.idProgressoEstado == 0}"/>
+                    <h:graphicImage name="ajax-loading-16.gif" library="images" rendered="#{mapBuilderBean.idProgressoEstado == 1}"/>
+                    <h:graphicImage name="green-check-16.png" library="images" rendered="#{mapBuilderBean.idProgressoEstado == 2}"/>
+                    <h:graphicImage name="red-cancel-16.png" library="images" rendered="#{mapBuilderBean.idProgressoEstado == 3}"/>
+                </h:panelGroup>
+                <h:outputText value="Carregando Estados!"/>
+                
+                <h:panelGroup>
+                    <h:inputHidden rendered="#{mapBuilderBean.idProgressoCidade == 0}"/> 
+                    <h:graphicImage name="ajax-loading-16.gif" library="images" rendered="#{mapBuilderBean.idProgressoCidade == 1}"/>
+                    <h:graphicImage name="green-check-16.png" library="images" rendered="#{mapBuilderBean.idProgressoCidade == 2}"/>
+                    <h:graphicImage name="red-cancel-16.png" library="images" rendered="#{mapBuilderBean.idProgressoCidade == 3}"/>
+                </h:panelGroup>
+                <h:outputText value="Carregando Cidades!"/>
+            </h:panelGrid>
+            <p:progressBar displayOnly="true" id="pbar-map-load" widgetVar="pbarMapLoad" labelTemplate="{value}%" value="#{mapBuilderBean.pcProgresso}"/>
+        </p:dialog>
+    </h:form>
+    
+    <h:form id="form-legenda">
+        <p:dialog appendTo="@(body)"
+                  resizable="false"
+                  closable="false"
+                  modal="false"
+                  widgetVar="dlgLegendaPais"
+                  position="left,bottom"
+                  header="#{mapBuilderBean.legendaPais.dsLegenda}"
+                  rendered="#{(not empty sessionScope.periodoIntervaloComparavel) and (not empty sessionScope.listaFato) and (not empty mapBuilderBean.legendaPais)}">
+            <table>
+                <ui:repeat value="#{mapBuilderBean.legendaPais.listaItemLegenda}" var="itemLegenda">
+                    <tr>
+                        <td><div style="width: 16px; height: 16px; border: 1px solid; background-color: #{itemLegenda.hexCorItemLegenda}"/></td>
+                        <td><h:outputText value="#{itemLegenda.dsItemLegenda}"/></td>
+                    </tr>
+                </ui:repeat>
+            </table>
+        </p:dialog>
+        <p:dialog appendTo="@(body)"
+                  resizable="false"
+                  closable="false"
+                  modal="false"
+                  widgetVar="dlgLegendaEstado"
+                  position="left,bottom"
+                  header="#{mapBuilderBean.legendaEstado.dsLegenda}"
+                  rendered="#{(not empty sessionScope.periodoIntervaloComparavel) and (not empty sessionScope.listaFato) and (not empty mapBuilderBean.legendaEstado)}">
+            <table>
+                <ui:repeat value="#{mapBuilderBean.legendaEstado.listaItemLegenda}" var="itemLegenda">
+                    <tr>
+                        <td><div style="width: 16px; height: 16px; border: 1px solid; background-color: #{itemLegenda.hexCorItemLegenda}"/></td>
+                        <td><h:outputText value="#{itemLegenda.dsItemLegenda}"/></td>
+                    </tr>
+                </ui:repeat>
+            </table>
+        </p:dialog>
+        <p:dialog appendTo="@(body)"
+                  resizable="false"
+                  closable="false"
+                  modal="false"
+                  widgetVar="dlgLegendaCidade"
+                  position="left,bottom"
+                  header="#{mapBuilderBean.legendaCidade.dsLegenda}"
+                  rendered="#{(not empty sessionScope.periodoIntervaloComparavel) and (not empty sessionScope.listaFato) and (not empty mapBuilderBean.legendaCidade)}">
+            <table>
+                <ui:repeat value="#{mapBuilderBean.legendaCidade.listaItemLegenda}" var="itemLegenda">
+                    <tr>
+                        <td><div style="width: 16px; height: 16px; border: 1px solid; background-color: #{itemLegenda.hexCorItemLegenda}"/></td>
+                        <td><h:outputText value="#{itemLegenda.dsItemLegenda}"/></td>
+                    </tr>
+                </ui:repeat>
+            </table>
+        </p:dialog>
+    </h:form>
+</ui:composition>

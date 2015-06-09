@@ -1,0 +1,267 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:p="http://primefaces.org/ui">
+    <h:outputStylesheet name="menu-geoinfo.css" library="css"/>
+    
+    <h:outputScript>
+        var inLoginVisible = false;
+        var inPollImportDataIniciado = false;
+        
+        function onClickDsSenha(event){
+            if (event.keyCode === 13) { 
+                document.getElementById('form-menu:linkLogin').click();
+            }
+        }
+        
+        function onClickLogin(){
+            if(inLoginVisible){
+                PF('pnlLogin').close();
+                inLoginVisible = false;
+            }else{
+                PF('pnlLogin').show();
+                inLoginVisible = true;
+            }
+        }
+        
+        function setInLoginVisible(inVisible){
+            inLoginVisible = inVisible;
+        }
+        
+        function iniciarPollImportData(){
+            PF('pollImportData').start();
+            inPollImportDataIniciado = true;
+        }
+        
+        function pararPollImportData(){
+            PF('pollImportData').stop();
+            inPollImportDataIniciado = false;
+        }
+    </h:outputScript>
+    
+    <h:form id="form-menu">
+        <b><h:outputText value="GeoInfo" styleClass="otext-logo"/></b>
+        <b><h:outputText value="Descubra seu potencial!" styleClass="otext-slogan"/></b>
+
+        <p:menubar styleClass="menubar">
+            <p:menuitem value="INICIO" 
+                        icon="ui-icon-home" 
+                        styleClass="menuitem"
+                        action="#{pessoaLoginBean.home()}"/>
+            <p:menuitem value="CONTATO" 
+                        icon="ui-icon-mail-closed" 
+                        styleClass="menuitem"/>
+            <p:menuitem value="SOBRE" 
+                        icon="ui-icon-comment" 
+                        styleClass="menuitem"/>
+            <p:submenu label="IMPORTAR DADOS"
+                       rendered="#{not empty sessionScope.pessoaLogada}">
+                <p:menuitem value="FORMATO GEOINFO"
+                            onclick="PF('dlgImportDataGeoInfo').show();"/>
+                <p:menuitem value="FORMATO XML NF-E"
+                            onclick="PF('dlgImportDataNFe').show();"/>
+            </p:submenu>
+
+            <f:facet name="options">
+                <p:commandButton value="Login"
+                                 icon="ui-icon-person"
+                                 onclick="onClickLogin();"
+                                 rendered="#{empty sessionScope.pessoaLogada}"/>
+                <h:panelGrid columns="2" 
+                             cellspacing="6"
+                             rendered="#{not empty sessionScope.pessoaLogada}">
+                    <h:outputText value="Olá #{sessionScope.pessoaLogada.dsPessoa}!"/>
+                    <h:commandLink id="linkLogoff"
+                                   value="Sair" 
+                                   action="#{pessoaLoginBean.logoff()}"/>
+                </h:panelGrid>
+            </f:facet>
+        </p:menubar>
+ 
+        <p:panel id="panel-login" 
+                 header="Login" 
+                 closable="true"
+                 widgetVar="pnlLogin" 
+                 styleClass="panelLogin"
+                 visible="false">
+            <f:ajax event="close" onevent="setInLoginVisible(false)"/>
+            <h:panelGrid columns="2">
+                <h:outputLabel value="Usuário" 
+                               for="dsUsuario"/>
+                <p:inputText id="dsUsuario" 
+                             value="#{pessoaLoginBean.dsUsuario}"/>
+                <h:outputLabel value="Senha" 
+                               for="dsSenha"/>
+                <h:inputSecret id="dsSenha" 
+                               value="#{pessoaLoginBean.dsSenha}"
+                               onkeypress="onClickDsSenha(event);"/>
+                <h:inputHidden/>
+                <h:commandLink id="linkLogin"
+                               value="Entrar" 
+                               action="#{pessoaLoginBean.login()}"/>
+            </h:panelGrid>
+        </p:panel>
+        
+        <p:poll autoStart="false" 
+                interval="1" 
+                update=":form-import-data-geoinfo:pgrid-import-data-geoinfo :form-import-data-nfe:pgrid-import-data-nfe" 
+                widgetVar="pollImportData"/>
+    </h:form>
+    
+    <h:form id="form-import-data-geoinfo"
+            enctype="multipart/form-data">
+        <p:dialog header="Importar Dados via Arquivo GeoInfo (CSV)" 
+                  widgetVar="dlgImportDataGeoInfo"
+                  appendTo="@(body)"
+                  width="500"
+                  height="400"
+                  minimizable="true">
+            <p:ajax event="close" 
+                    listener="#{importDataBean.fecharImportacao}"
+                    update=":form-import-data-geoinfo:pgrid-import-data-geoinfo"
+                    oncomplete="pararPollImportData();"/>
+            <h:panelGrid columns="1"
+                         id="pgrid-import-data-geoinfo"
+                         style="width: 100%">
+                <p:fileUpload id="fileup-import-data-geoinfo"
+                              fileUploadListener="#{importDataBean.importarCSV}" 
+                              mode="advanced" 
+                              dragDropSupport="true"  
+                              multiple="false" 
+                              allowTypes="/(\.|\/)(geoinfo)$/"
+                              fileLimit="1"
+                              fileLimitMessage="Limite de arquivos atingido! Você só pode importar um arquivo por vez!"
+                              invalidFileMessage="Tipo de arquivo inválido! Somente são aceitos arquivos com extensão GeoInfo!"
+                              invalidSizeMessage="Tamanho de arquivo excedido!"
+                              cancelLabel="Cancelar"
+                              uploadLabel="Importar"
+                              label="Arquivo"
+                              update=":form-message:growl-message :form-import-data-geoinfo:pgrid-import-data-geoinfo"
+                              onstart="iniciarPollImportData();"
+                              oncomplete="pararPollImportData();">
+                </p:fileUpload>
+                
+                <p:progressBar displayOnly="true"
+                               id="pbar-import-data-geoinfo"
+                               widgetVar="pbarImportDataGeoInfo"
+                               labelTemplate="{value}%"
+                               value="#{importDataBean.pcProgresso}"
+                               style="margin-top: 6px; margin-bottom: 6px;">
+                </p:progressBar> 
+                
+                <h:outputText id="otext-import-data-geoinfo" 
+                              value="Importando linha #{importDataBean.nrLinha} de #{importDataBean.nrTotalLinha} do arquivo #{importDataBean.dsArquivo}"
+                              rendered="#{not empty importDataBean.listaGeoInfoLogNode}"/>
+                
+                <p:dataTable id="dtable-import-data-geoinfo-log"
+                             widgetVar="dTableImportDataGeoInfoLog"
+                             value="#{importDataBean.listaGeoInfoLogNode}"
+                             var="logItem"
+                             scrollable="true"
+                             scrollHeight="200"
+                             scrollRows="10"
+                             liveScroll="true"
+                             rendered="#{not empty importDataBean.listaGeoInfoLogNode}"
+                             style="margin-top: 6px; margin-bottom: 6px;">
+                    <p:column headerText="Tipo"
+                              width="55">
+                        <h:outputText value="#{logItem.idLog}" />
+                    </p:column>
+                    <p:column headerText="Data"
+                              sortBy="#{logItem.dtLog}"
+                              width="70">
+                        <h:outputText value="#{logItem.dtLogFormated}" />
+                    </p:column>
+                    <p:column headerText="Mensagem"
+                              width="270">
+                        <h:outputText value="#{logItem.dsMensagem}" />
+                    </p:column>
+                </p:dataTable>
+                
+                <h:panelGroup>
+                    <h:outputText value="Para ver como montar o arquivo, consulte o "/>
+                    <h:outputLink value="https://docs.google.com/document/d/1WTtvJTa29_3t_HzyccmJ-K_5ZCgzfkWs4riNPZatyzM/edit?usp=sharing"
+                                  target="_new">
+                        <h:outputText value="Manual"/>
+                    </h:outputLink>
+                </h:panelGroup>
+            </h:panelGrid>
+        </p:dialog>    
+    </h:form>
+    
+    <h:form id="form-import-data-nfe"
+            enctype="multipart/form-data">
+        <p:dialog header="Importar Dados via Arquivo NF-e (XML)" 
+                  widgetVar="dlgImportDataNFe"
+                  appendTo="@(body)"
+                  width="800"
+                  height="600"
+                  minimizable="true">
+            <p:ajax event="close" 
+                    listener="#{importDataBean.fecharImportacao}"
+                    update=":form-import-data-nfe:pgrid-import-data-nfe"
+                    oncomplete="pararPollImportData();"/>
+            <h:panelGrid columns="1"
+                         id="pgrid-import-data-nfe"
+                         style="width: 100%">
+                <p:scrollPanel mode="native" style="width: 100%; height: 200px;">
+                    <p:fileUpload id="fileup-import-data-nfe"
+                                  fileUploadListener="#{importDataBean.importarXMLNFe}" 
+                                  mode="advanced" 
+                                  dragDropSupport="true"  
+                                  multiple="true" 
+                                  allowTypes="/(\.|\/)(xml)$/"
+                                  invalidFileMessage="Tipo de arquivo inválido! Somente são aceitos arquivos com extensão XML!"
+                                  invalidSizeMessage="Tamanho de arquivo excedido!"
+                                  cancelLabel="Cancelar"
+                                  uploadLabel="Importar"
+                                  label="Arquivo"
+                                  update=":form-message:growl-message :form-import-data-nfe:pgrid-import-data-nfe"
+                                  onstart="iniciarPollImportData();"
+                                  oncomplete="pararPollImportData();">
+                    </p:fileUpload>
+                </p:scrollPanel>
+                
+                <p:progressBar displayOnly="true"
+                               id="pbar-import-data-nfe"
+                               widgetVar="pbarImportDataNFe"
+                               labelTemplate="{value}%"
+                               value="#{importDataBean.pcProgresso}"
+                               style="margin-top: 6px; margin-bottom: 6px;">
+                </p:progressBar> 
+                
+                <h:outputText id="otext-import-data-nfe" 
+                              value="Importando arquivo #{importDataBean.nrLinha} de #{importDataBean.nrTotalLinha} (#{importDataBean.dsArquivo})"
+                              rendered="#{not empty importDataBean.listaGeoInfoLogNode}"/>
+                
+                <p:dataTable id="dtable-import-data-nfe-log"
+                             widgetVar="dTableImportDataNFeLog"
+                             value="#{importDataBean.listaGeoInfoLogNode}"
+                             var="logItem"
+                             scrollable="true"
+                             scrollHeight="200"
+                             scrollRows="10"
+                             liveScroll="true"
+                             rendered="#{not empty importDataBean.listaGeoInfoLogNode}"
+                             style="margin-top: 6px; margin-bottom: 6px;">
+                    <p:column headerText="Tipo"
+                              width="55">
+                        <h:outputText value="#{logItem.idLog}" />
+                    </p:column>
+                    <p:column headerText="Data"
+                              sortBy="#{logItem.dtLog}"
+                              width="70">
+                        <h:outputText value="#{logItem.dtLogFormated}" />
+                    </p:column>
+                    <p:column headerText="Mensagem"
+                              width="270">
+                        <h:outputText value="#{logItem.dsMensagem}" />
+                    </p:column>
+                </p:dataTable>
+            </h:panelGrid>
+        </p:dialog>    
+    </h:form>
+</ui:composition>
+
+

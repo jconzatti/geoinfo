@@ -1,0 +1,6 @@
+.icon-green-check-16{
+    height: 16px;
+    width: 16px;
+    background-image: url("#{resource['images/green-check-16.png']}") !important;
+}
+
