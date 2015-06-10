@@ -7,7 +7,6 @@
     
     <h:outputScript>
         var inLoginVisible = false;
-        var inPollImportDataIniciado = false;
         
         function onClickDsSenha(event){
             if (event.keyCode === 13) { 
@@ -29,14 +28,20 @@
             inLoginVisible = inVisible;
         }
         
-        function iniciarPollImportData(){
-            PF('pollImportData').start();
-            inPollImportDataIniciado = true;
+        function iniciarPollImportDataGeoInfo(){
+            PF('pollImportDataGeoInfo').start();
         }
         
-        function pararPollImportData(){
-            PF('pollImportData').stop();
-            inPollImportDataIniciado = false;
+        function pararPollImportDataGeoInfo(){
+            PF('pollImportDataGeoInfo').stop();
+        }
+        
+        function iniciarPollImportDataNFe(){
+            PF('pollImportDataNFe').start();
+        }
+        
+        function pararPollImportDataNFe(){
+            PF('pollImportDataNFe').stop();
         }
     </h:outputScript>
     
@@ -105,8 +110,13 @@
         
         <p:poll autoStart="false" 
                 interval="1" 
-                update=":form-import-data-geoinfo:pgrid-import-data-geoinfo :form-import-data-nfe:pgrid-import-data-nfe" 
-                widgetVar="pollImportData"/>
+                update=":form-import-data-geoinfo:pgrid-import-data-geoinfo" 
+                widgetVar="pollImportDataGeoInfo"/>
+        
+        <p:poll autoStart="false" 
+                interval="1" 
+                update=":form-import-data-nfe:pgrid-import-data-nfe" 
+                widgetVar="pollImportDataNFe"/>
     </h:form>
     
     <h:form id="form-import-data-geoinfo"
@@ -120,7 +130,7 @@
             <p:ajax event="close" 
                     listener="#{importDataBean.fecharImportacao}"
                     update=":form-import-data-geoinfo:pgrid-import-data-geoinfo"
-                    oncomplete="pararPollImportData();"/>
+                    oncomplete="pararPollImportDataGeoInfo();"/>
             <h:panelGrid columns="1"
                          id="pgrid-import-data-geoinfo"
                          style="width: 100%">
@@ -138,8 +148,8 @@
                               uploadLabel="Importar"
                               label="Arquivo"
                               update=":form-message:growl-message :form-import-data-geoinfo:pgrid-import-data-geoinfo"
-                              onstart="iniciarPollImportData();"
-                              oncomplete="pararPollImportData();">
+                              onstart="iniciarPollImportDataGeoInfo();"
+                              oncomplete="pararPollImportDataGeoInfo();">
                 </p:fileUpload>
                 
                 <p:progressBar displayOnly="true"
@@ -201,7 +211,7 @@
             <p:ajax event="close" 
                     listener="#{importDataBean.fecharImportacao}"
                     update=":form-import-data-nfe:pgrid-import-data-nfe"
-                    oncomplete="pararPollImportData();"/>
+                    oncomplete="pararPollImportDataNFe();"/>
             <h:panelGrid columns="1"
                          id="pgrid-import-data-nfe"
                          style="width: 100%">
@@ -218,8 +228,8 @@
                                   uploadLabel="Importar"
                                   label="Arquivo"
                                   update=":form-message:growl-message :form-import-data-nfe:pgrid-import-data-nfe"
-                                  onstart="iniciarPollImportData();"
-                                  oncomplete="pararPollImportData();">
+                                  onstart="iniciarPollImportDataNFe();"
+                                  oncomplete="pararPollImportDataNFe();">
                     </p:fileUpload>
                 </p:scrollPanel>
                 
