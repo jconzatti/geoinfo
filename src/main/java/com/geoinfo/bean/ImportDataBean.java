@@ -237,7 +237,7 @@ public class ImportDataBean implements Serializable{
             if(this.listaUploadedFileXMLNFe.isEmpty())
                 this.listaGeoInfoLogNode.clear();
             this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Nome do Arquivo: " + fileUploaded.getFile().getFileName()));
-            listaUploadedFileXMLNFe.add(fileUploaded.getFile());
+            this.listaUploadedFileXMLNFe.add(fileUploaded.getFile());
         }
     }
     
