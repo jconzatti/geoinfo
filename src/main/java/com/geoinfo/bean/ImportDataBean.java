@@ -229,13 +229,12 @@ public class ImportDataBean implements Serializable{
     
     public void fecharImportacao(CloseEvent closeEvent){
         this.inFechouImportacao = true;
+        this.listaGeoInfoLogNode.clear();
         this.listaUploadedFileXMLNFe.clear();
     }
     
     public void importarXMLNFe(FileUploadEvent fileUploaded){
         if(fileUploaded != null){
-            if(this.listaUploadedFileXMLNFe.isEmpty())
-                this.listaGeoInfoLogNode.clear();
             this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Nome do Arquivo: " + fileUploaded.getFile().getFileName()));
             this.listaUploadedFileXMLNFe.add(fileUploaded.getFile());
         }
