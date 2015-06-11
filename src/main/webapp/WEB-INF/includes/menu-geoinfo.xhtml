@@ -124,24 +124,21 @@
         <p:dialog header="Importar Dados via Arquivo GeoInfo (CSV)" 
                   widgetVar="dlgImportDataGeoInfo"
                   appendTo="@(body)"
-                  width="500"
-                  height="400"
+                  width="600"
+                  height="550"
                   minimizable="true">
             <p:ajax event="close" 
                     listener="#{importDataBean.fecharImportacao}"
                     update=":form-import-data-geoinfo:pgrid-import-data-geoinfo"
                     oncomplete="pararPollImportDataGeoInfo();"/>
-            <h:panelGrid columns="1"
-                         id="pgrid-import-data-geoinfo"
-                         style="width: 100%">
+            <p:scrollPanel mode="native"
+                           style="width: 100%; height: 200px;">
                 <p:fileUpload id="fileup-import-data-geoinfo"
                               fileUploadListener="#{importDataBean.importarCSV}" 
                               mode="advanced" 
                               dragDropSupport="true"  
                               multiple="false" 
                               allowTypes="/(\.|\/)(geoinfo)$/"
-                              fileLimit="1"
-                              fileLimitMessage="Limite de arquivos atingido! Você só pode importar um arquivo por vez!"
                               invalidFileMessage="Tipo de arquivo inválido! Somente são aceitos arquivos com extensão GeoInfo!"
                               invalidSizeMessage="Tamanho de arquivo excedido!"
                               cancelLabel="Cancelar"
@@ -150,7 +147,11 @@
                               update=":form-message:growl-message :form-import-data-geoinfo:pgrid-import-data-geoinfo"
                               onstart="iniciarPollImportDataGeoInfo();"
                               oncomplete="pararPollImportDataGeoInfo();">
-                </p:fileUpload>
+                </p:fileUpload>   
+            </p:scrollPanel>
+            <h:panelGrid columns="1"
+                         id="pgrid-import-data-geoinfo"
+                         style="width: 100%">
                 
                 <p:progressBar displayOnly="true"
                                id="pbar-import-data-geoinfo"
@@ -212,26 +213,27 @@
                     listener="#{importDataBean.fecharImportacao}"
                     update=":form-import-data-nfe:pgrid-import-data-nfe"
                     oncomplete="pararPollImportDataNFe();"/>
+            <p:scrollPanel mode="native" 
+                           style="width: 100%; height: 200px;">
+                <p:fileUpload id="fileup-import-data-nfe"
+                              fileUploadListener="#{importDataBean.importarXMLNFe}" 
+                              mode="advanced" 
+                              dragDropSupport="true"  
+                              multiple="true" 
+                              allowTypes="/(\.|\/)(xml)$/"
+                              invalidFileMessage="Tipo de arquivo inválido! Somente são aceitos arquivos com extensão XML!"
+                              invalidSizeMessage="Tamanho de arquivo excedido!"
+                              cancelLabel="Cancelar"
+                              uploadLabel="Importar"
+                              label="Arquivo"
+                              update=":form-import-data-nfe:pgrid-import-data-nfe"
+                              onstart="iniciarPollImportDataNFe();"
+                              oncomplete="pararPollImportDataNFe();">
+                </p:fileUpload>
+            </p:scrollPanel>
             <h:panelGrid columns="1"
                          id="pgrid-import-data-nfe"
                          style="width: 100%">
-                <p:scrollPanel mode="native" style="width: 100%; height: 200px;">
-                    <p:fileUpload id="fileup-import-data-nfe"
-                                  fileUploadListener="#{importDataBean.importarXMLNFe}" 
-                                  mode="advanced" 
-                                  dragDropSupport="true"  
-                                  multiple="true" 
-                                  allowTypes="/(\.|\/)(xml)$/"
-                                  invalidFileMessage="Tipo de arquivo inválido! Somente são aceitos arquivos com extensão XML!"
-                                  invalidSizeMessage="Tamanho de arquivo excedido!"
-                                  cancelLabel="Cancelar"
-                                  uploadLabel="Importar"
-                                  label="Arquivo"
-                                  update=":form-message:growl-message :form-import-data-nfe:pgrid-import-data-nfe"
-                                  onstart="iniciarPollImportDataNFe();"
-                                  oncomplete="pararPollImportDataNFe();">
-                    </p:fileUpload>
-                </p:scrollPanel>
                 
                 <p:progressBar displayOnly="true"
                                id="pbar-import-data-nfe"
