@@ -7,6 +7,8 @@
     
     <h:outputScript>
         var inLoginVisible = false;
+        var inPollImportDataGeoInfoIniciado = false;
+        var inPollImportDataNFeIniciado = false;
         
         function onClickDsSenha(event){
             if (event.keyCode === 13) { 
@@ -28,20 +30,24 @@
             inLoginVisible = inVisible;
         }
         
-        function iniciarPollImportDataGeoInfo(){
-            PF('pollImportDataGeoInfo').start();
+        function onImportDataGeoInfo(data){
+            if(data.status === "begin"){
+                inPollImportDataGeoInfoIniciado = true;
+                PF('pollImportDataGeoInfo').start();
+            }else if(data.status === "success"){
+                inPollImportDataGeoInfoIniciado = false;
+                PF('pollImportDataGeoInfo').stop();
+            }
         }
         
-        function pararPollImportDataGeoInfo(){
-            PF('pollImportDataGeoInfo').stop();
-        }
-        
-        function iniciarPollImportDataNFe(){
-            PF('pollImportDataNFe').start();
-        }
-        
-        function pararPollImportDataNFe(){
-            PF('pollImportDataNFe').stop();
+        function onImportDataNFe(data){
+            if(data.status === "begin"){
+                inPollImportDataNFeIniciado = true;
+                PF('pollImportDataNFe').start();
+            }else if(data.status === "success"){
+                inPollImportDataNFeIniciado = false;
+                PF('pollImportDataNFe').stop();
+            }
         }
     </h:outputScript>
     
@@ -144,9 +150,7 @@
                               cancelLabel="Cancelar"
                               uploadLabel="Importar"
                               label="Arquivo"
-                              update=":form-message:growl-message :form-import-data-geoinfo:pgrid-import-data-geoinfo"
-                              onstart="iniciarPollImportDataGeoInfo();"
-                              oncomplete="pararPollImportDataGeoInfo();">
+                              update=":form-message:growl-message :form-import-data-geoinfo:pgrid-import-data-geoinfo">
                 </p:fileUpload>   
             </p:scrollPanel>
             <h:panelGrid columns="1"
@@ -190,6 +194,14 @@
                     </p:column>
                 </p:dataTable>
                 
+                <p:commandButton value="Importar"  
+                                 style="float: right; height: 32px; width: 90px; margin-top: 2px;">
+                    <f:ajax listener="#{importDataBean.importarListaCSV}" 
+                            execute="@none" 
+                            render="@none"
+                            onevent="onImportDataGeoInfo"/>
+                </p:commandButton>
+                
                 <h:panelGroup>
                     <h:outputText value="Para ver como montar o arquivo, consulte o "/>
                     <h:outputLink value="https://docs.google.com/document/d/1WTtvJTa29_3t_HzyccmJ-K_5ZCgzfkWs4riNPZatyzM/edit?usp=sharing"
@@ -226,9 +238,7 @@
                               cancelLabel="Cancelar"
                               uploadLabel="Importar"
                               label="Arquivo"
-                              update=":form-import-data-nfe:pgrid-import-data-nfe"
-                              onstart="iniciarPollImportDataNFe();"
-                              oncomplete="pararPollImportDataNFe();">
+                              update=":form-import-data-nfe:pgrid-import-data-nfe">
                 </p:fileUpload>
             </p:scrollPanel>
             <h:panelGrid columns="1"
@@ -271,6 +281,14 @@
                         <h:outputText value="#{logItem.dsMensagem}" />
                     </p:column>
                 </p:dataTable>
+                
+                <p:commandButton value="Importar"  
+                                 style="float: right; height: 32px; width: 90px; margin-top: 2px;">
+                    <f:ajax listener="#{importDataBean.importarListaXMLNFe}" 
+                            execute="@none" 
+                            render="@none"
+                            onevent="onImportDataNFe"/>
+                </p:commandButton>
             </h:panelGrid>
         </p:dialog>    
     </h:form>

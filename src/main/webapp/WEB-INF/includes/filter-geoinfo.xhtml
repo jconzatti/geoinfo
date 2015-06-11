@@ -17,8 +17,11 @@
                     PF('layoutPage').show('east');
                     PF('layoutPage').toggle('east');
                 }
-                if(inPollImportDataIniciado){
-                    PF('pollImportData').start();
+                if(inPollImportDataGeoInfoIniciado){
+                    PF('pollImportDataGeoInfo').start();
+                }
+                if(inPollImportDataNFeIniciado){
+                    PF('pollImportDataNFe').start();
                 }
             }
         }
