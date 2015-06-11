@@ -30,23 +30,39 @@
             inLoginVisible = inVisible;
         }
         
+        function iniciarPollImportDataGeoInfo(){
+            inPollImportDataGeoInfoIniciado = true;
+            PF('pollImportDataGeoInfo').start();
+        }
+        
+        function pararPollImportDataGeoInfo(){
+            inPollImportDataGeoInfoIniciado = false;
+            PF('pollImportDataGeoInfo').stop();
+        }
+        
+        function iniciarPollImportDataNFe(){
+            inPollImportDataNFeIniciado = true;
+            PF('pollImportDataNFe').start();
+        }
+        
+        function pararPollImportDataNFe(){
+            inPollImportDataNFeIniciado = false;
+            PF('pollImportDataNFe').stop();
+        }
+        
         function onImportDataGeoInfo(data){
             if(data.status === "begin"){
-                inPollImportDataGeoInfoIniciado = true;
-                PF('pollImportDataGeoInfo').start();
+                iniciarPollImportDataGeoInfo();
             }else if(data.status === "success"){
-                inPollImportDataGeoInfoIniciado = false;
-                PF('pollImportDataGeoInfo').stop();
+                pararPollImportDataGeoInfo();
             }
         }
         
         function onImportDataNFe(data){
             if(data.status === "begin"){
-                inPollImportDataNFeIniciado = true;
-                PF('pollImportDataNFe').start();
+                iniciarPollImportDataNFe();
             }else if(data.status === "success"){
-                inPollImportDataNFeIniciado = false;
-                PF('pollImportDataNFe').stop();
+                pararPollImportDataNFe();
             }
         }
     </h:outputScript>
@@ -130,8 +146,8 @@
         <p:dialog header="Importar Dados via Arquivo GeoInfo (CSV)" 
                   widgetVar="dlgImportDataGeoInfo"
                   appendTo="@(body)"
-                  width="600"
-                  height="550"
+                  width="800"
+                  height="600"
                   minimizable="true">
             <p:ajax event="close" 
                     listener="#{importDataBean.fecharImportacao}"
@@ -143,16 +159,26 @@
                               fileUploadListener="#{importDataBean.importarCSV}" 
                               mode="advanced" 
                               dragDropSupport="true"  
-                              multiple="false" 
+                              multiple="true" 
                               allowTypes="/(\.|\/)(geoinfo)$/"
                               invalidFileMessage="Tipo de arquivo inválido! Somente são aceitos arquivos com extensão GeoInfo!"
                               invalidSizeMessage="Tamanho de arquivo excedido!"
                               cancelLabel="Cancelar"
-                              uploadLabel="Importar"
+                              uploadLabel="Carregar"
                               label="Arquivo"
                               update=":form-message:growl-message :form-import-data-geoinfo:pgrid-import-data-geoinfo">
                 </p:fileUpload>   
             </p:scrollPanel>
+                
+            <p:commandButton value="Importar Dados"  
+                             style="height: 32px; width: 150px; margin-top: 2px;">
+                <p:ajax event="click"
+                        listener="#{importDataBean.importarListaCSV()}"
+                        update=":form-message:growl-message :form-import-data-geoinfo:pgrid-import-data-geoinfo"
+                        onstart="iniciarPollImportDataGeoInfo();"
+                        oncomplete="pararPollImportDataGeoInfo();"/>
+            </p:commandButton>
+            
             <h:panelGrid columns="1"
                          id="pgrid-import-data-geoinfo"
                          style="width: 100%">
@@ -166,8 +192,7 @@
                 </p:progressBar> 
                 
                 <h:outputText id="otext-import-data-geoinfo" 
-                              value="Importando linha #{importDataBean.nrLinha} de #{importDataBean.nrTotalLinha} do arquivo #{importDataBean.dsArquivo}"
-                              rendered="#{not empty importDataBean.listaGeoInfoLogNode}"/>
+                              value="#{importDataBean.dsMensagem}"/>
                 
                 <p:dataTable id="dtable-import-data-geoinfo-log"
                              widgetVar="dTableImportDataGeoInfoLog"
@@ -193,14 +218,6 @@
                         <h:outputText value="#{logItem.dsMensagem}" />
                     </p:column>
                 </p:dataTable>
-                
-                <p:commandButton value="Importar"  
-                                 style="float: right; height: 32px; width: 90px; margin-top: 2px;">
-                    <f:ajax listener="#{importDataBean.importarListaCSV}" 
-                            execute="@none" 
-                            render="@none"
-                            onevent="onImportDataGeoInfo"/>
-                </p:commandButton>
                 
                 <h:panelGroup>
                     <h:outputText value="Para ver como montar o arquivo, consulte o "/>
@@ -236,11 +253,21 @@
                               invalidFileMessage="Tipo de arquivo inválido! Somente são aceitos arquivos com extensão XML!"
                               invalidSizeMessage="Tamanho de arquivo excedido!"
                               cancelLabel="Cancelar"
-                              uploadLabel="Importar"
+                              uploadLabel="Carregar"
                               label="Arquivo"
                               update=":form-import-data-nfe:pgrid-import-data-nfe">
                 </p:fileUpload>
             </p:scrollPanel>
+                
+            <p:commandButton value="Importar Dados"  
+                             style="height: 32px; width: 150px; margin-top: 2px;">
+                <p:ajax event="click"
+                        listener="#{importDataBean.importarListaXMLNFe()}"
+                        update=":form-message:growl-message :form-import-data-nfe:pgrid-import-data-nfe"
+                        onstart="iniciarPollImportDataNFe();"
+                        oncomplete="pararPollImportDataNFe();"/>
+            </p:commandButton>
+            
             <h:panelGrid columns="1"
                          id="pgrid-import-data-nfe"
                          style="width: 100%">
@@ -254,8 +281,7 @@
                 </p:progressBar> 
                 
                 <h:outputText id="otext-import-data-nfe" 
-                              value="Importando arquivo #{importDataBean.nrLinha} de #{importDataBean.nrTotalLinha} (#{importDataBean.dsArquivo})"
-                              rendered="#{not empty importDataBean.listaGeoInfoLogNode}"/>
+                              value="#{importDataBean.dsMensagem}"/>
                 
                 <p:dataTable id="dtable-import-data-nfe-log"
                              widgetVar="dTableImportDataNFeLog"
@@ -281,14 +307,6 @@
                         <h:outputText value="#{logItem.dsMensagem}" />
                     </p:column>
                 </p:dataTable>
-                
-                <p:commandButton value="Importar"  
-                                 style="float: right; height: 32px; width: 90px; margin-top: 2px;">
-                    <f:ajax listener="#{importDataBean.importarListaXMLNFe}" 
-                            execute="@none" 
-                            render="@none"
-                            onevent="onImportDataNFe"/>
-                </p:commandButton>
             </h:panelGrid>
         </p:dialog>    
     </h:form>
