@@ -31,6 +31,7 @@
         }
         
         function iniciarPollImportDataGeoInfo(){
+            alert('Iniciando poll!');
             inPollImportDataGeoInfoIniciado = true;
             PF('pollImportDataGeoInfo').start();
         }
@@ -176,7 +177,7 @@
                         listener="#{importDataBean.importarListaCSV()}"
                         update=":form-message:growl-message :form-import-data-geoinfo:pgrid-import-data-geoinfo"
                         onstart="iniciarPollImportDataGeoInfo();"
-                        oncomplete="pararPollImportDataGeoInfo();"/>
+                        onsuccess="pararPollImportDataGeoInfo();"/>
             </p:commandButton>
             
             <h:panelGrid columns="1"
