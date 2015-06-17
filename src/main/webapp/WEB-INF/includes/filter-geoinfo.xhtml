@@ -71,33 +71,59 @@
                   header="Carregando informações do Mapa. Aguarde!"
                   onShow="PF('pollMapLoad').start();"
                   onHide="PF('pollMapLoad').stop();">
-            <p:poll autoStart="false" interval="1" update=":form-map-load:pbar-map-load :form-map-load:pgrid-map-load" widgetVar="pollMapLoad"/>
-            <h:panelGrid columns="2" id="pgrid-map-load">
+            <p:poll autoStart="false" 
+                    interval="1" 
+                    update=":form-map-load:pbar-map-load :form-map-load:pgrid-map-load" 
+                    widgetVar="pollMapLoad"/>
+            <h:panelGrid columns="2" 
+                         id="pgrid-map-load">
                 <h:panelGroup>
                     <h:inputHidden rendered="#{mapBuilderBean.idProgressoPais == 0}"/>
-                    <h:graphicImage name="ajax-loading-16.gif" library="images" rendered="#{mapBuilderBean.idProgressoPais == 1}"/>
-                    <h:graphicImage name="green-check-16.png" library="images" rendered="#{mapBuilderBean.idProgressoPais == 2}"/>
-                    <h:graphicImage name="red-cancel-16.png" library="images" rendered="#{mapBuilderBean.idProgressoPais == 3}"/>
+                    <h:graphicImage name="ajax-loading-16.gif" 
+                                    library="images" 
+                                    rendered="#{mapBuilderBean.idProgressoPais == 1}"/>
+                    <h:graphicImage name="green-check-16.png" 
+                                    library="images" 
+                                    rendered="#{mapBuilderBean.idProgressoPais == 2}"/>
+                    <h:graphicImage name="red-cancel-16.png" 
+                                    library="images" 
+                                    rendered="#{mapBuilderBean.idProgressoPais == 3}"/>
                 </h:panelGroup>
                 <h:outputText value="Carregando Países!"/>
                 
                 <h:panelGroup>
                     <h:inputHidden rendered="#{mapBuilderBean.idProgressoEstado == 0}"/>
-                    <h:graphicImage name="ajax-loading-16.gif" library="images" rendered="#{mapBuilderBean.idProgressoEstado == 1}"/>
-                    <h:graphicImage name="green-check-16.png" library="images" rendered="#{mapBuilderBean.idProgressoEstado == 2}"/>
-                    <h:graphicImage name="red-cancel-16.png" library="images" rendered="#{mapBuilderBean.idProgressoEstado == 3}"/>
+                    <h:graphicImage name="ajax-loading-16.gif" 
+                                    library="images" 
+                                    rendered="#{mapBuilderBean.idProgressoEstado == 1}"/>
+                    <h:graphicImage name="green-check-16.png" 
+                                    library="images" 
+                                    rendered="#{mapBuilderBean.idProgressoEstado == 2}"/>
+                    <h:graphicImage name="red-cancel-16.png" 
+                                    library="images" 
+                                    rendered="#{mapBuilderBean.idProgressoEstado == 3}"/>
                 </h:panelGroup>
                 <h:outputText value="Carregando Estados!"/>
                 
                 <h:panelGroup>
                     <h:inputHidden rendered="#{mapBuilderBean.idProgressoCidade == 0}"/> 
-                    <h:graphicImage name="ajax-loading-16.gif" library="images" rendered="#{mapBuilderBean.idProgressoCidade == 1}"/>
-                    <h:graphicImage name="green-check-16.png" library="images" rendered="#{mapBuilderBean.idProgressoCidade == 2}"/>
-                    <h:graphicImage name="red-cancel-16.png" library="images" rendered="#{mapBuilderBean.idProgressoCidade == 3}"/>
+                    <h:graphicImage name="ajax-loading-16.gif" 
+                                    library="images" 
+                                    rendered="#{mapBuilderBean.idProgressoCidade == 1}"/>
+                    <h:graphicImage name="green-check-16.png" 
+                                    library="images" 
+                                    rendered="#{mapBuilderBean.idProgressoCidade == 2}"/>
+                    <h:graphicImage name="red-cancel-16.png" 
+                                    library="images" 
+                                    rendered="#{mapBuilderBean.idProgressoCidade == 3}"/>
                 </h:panelGroup>
                 <h:outputText value="Carregando Cidades!"/>
             </h:panelGrid>
-            <p:progressBar displayOnly="true" id="pbar-map-load" widgetVar="pbarMapLoad" labelTemplate="{value}%" value="#{mapBuilderBean.pcProgresso}"/>
+            <p:progressBar displayOnly="true" 
+                           id="pbar-map-load" 
+                           widgetVar="pbarMapLoad" 
+                           labelTemplate="{value}%" 
+                           value="#{mapBuilderBean.pcProgresso}"/>
         </p:dialog>
     </h:form>
     

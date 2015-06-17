@@ -37,6 +37,7 @@
         }
         
         function pararPollImportDataGeoInfo(){
+            alert('Parando poll!');
             inPollImportDataGeoInfoIniciado = false;
             PF('pollImportDataGeoInfo').stop();
         }
@@ -150,10 +151,11 @@
                   width="800"
                   height="600"
                   minimizable="true">
+            
             <p:ajax event="close" 
                     listener="#{importDataBean.fecharImportacao}"
-                    update=":form-import-data-geoinfo:pgrid-import-data-geoinfo"
-                    oncomplete="pararPollImportDataGeoInfo();"/>
+                    update=":form-import-data-geoinfo:pgrid-import-data-geoinfo"/>
+            
             <p:scrollPanel mode="native"
                            style="width: 100%; height: 200px;">
                 <p:fileUpload id="fileup-import-data-geoinfo"
@@ -170,14 +172,12 @@
                               update=":form-message:growl-message :form-import-data-geoinfo:pgrid-import-data-geoinfo">
                 </p:fileUpload>   
             </p:scrollPanel>
-                
+            
             <p:commandButton value="Importar Dados"  
                              style="height: 32px; width: 150px; margin-top: 2px;">
                 <p:ajax event="click"
                         listener="#{importDataBean.importarListaCSV()}"
-                        update=":form-message:growl-message :form-import-data-geoinfo:pgrid-import-data-geoinfo"
-                        onstart="iniciarPollImportDataGeoInfo();"
-                        onsuccess="pararPollImportDataGeoInfo();"/>
+                        update=":form-message:growl-message :form-import-data-geoinfo:pgrid-import-data-geoinfo"/>
             </p:commandButton>
             
             <h:panelGrid columns="1"
