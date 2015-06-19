@@ -7,7 +7,7 @@
     
     <h:outputScript>
         var inLoginVisible = false;
-        var inPollImportDataGeoInfoIniciado = false;
+        var inPollImportDataIniciado = false;
         var inPollImportDataNFeIniciado = false;
         
         function onClickDsSenha(event){
@@ -30,16 +30,16 @@
             inLoginVisible = inVisible;
         }
         
-        function iniciarPollImportDataGeoInfo(){
+        function iniciarPollImportData(){
             alert('Iniciando poll!');
-            inPollImportDataGeoInfoIniciado = true;
-            PF('pollImportDataGeoInfo').start();
+            inPollImportDataIniciado = true;
+            PF('pollImportData').start();
         }
         
-        function pararPollImportDataGeoInfo(){
+        function pararPollImportData(){
             alert('Parando poll!');
-            inPollImportDataGeoInfoIniciado = false;
-            PF('pollImportDataGeoInfo').stop();
+            inPollImportDataIniciado = false;
+            PF('pollImportData').stop();
         }
         
         function iniciarPollImportDataNFe(){
@@ -52,11 +52,11 @@
             PF('pollImportDataNFe').stop();
         }
         
-        function onImportDataGeoInfo(data){
+        function onImportData(data){
             if(data.status === "begin"){
-                iniciarPollImportDataGeoInfo();
+                iniciarPollImportInfo();
             }else if(data.status === "success"){
-                pararPollImportDataGeoInfo();
+                pararPollImportData();
             }
         }
         
@@ -84,14 +84,10 @@
             <p:menuitem value="SOBRE" 
                         icon="ui-icon-comment" 
                         styleClass="menuitem"/>
-            <p:submenu label="IMPORTAR DADOS"
-                       rendered="#{not empty sessionScope.pessoaLogada}">
-                <p:menuitem value="FORMATO GEOINFO"
-                            onclick="PF('dlgImportDataGeoInfo').show();"/>
-                <p:menuitem value="FORMATO XML NF-E"
-                            onclick="PF('dlgImportDataNFe').show();"/>
-            </p:submenu>
-
+            <p:menuitem value="IMPORTAR DADOS"
+                        styleClass="menuitem"
+                        onclick="PF('dlgImportData').show();"
+                        rendered="#{not empty sessionScope.pessoaLogada}"/>
             <f:facet name="options">
                 <p:commandButton value="Login"
                                  icon="ui-icon-person"
@@ -134,8 +130,8 @@
         
         <p:poll autoStart="false" 
                 interval="1" 
-                update=":form-import-data-geoinfo:pgrid-import-data-geoinfo" 
-                widgetVar="pollImportDataGeoInfo"/>
+                update=":form-import-data:pgrid-import-data" 
+                widgetVar="pollImportData"/>
         
         <p:poll autoStart="false" 
                 interval="1" 
@@ -143,10 +139,10 @@
                 widgetVar="pollImportDataNFe"/>
     </h:form>
     
-    <h:form id="form-import-data-geoinfo"
+    <h:form id="form-import-data"
             enctype="multipart/form-data">
-        <p:dialog header="Importar Dados via Arquivo GeoInfo (CSV)" 
-                  widgetVar="dlgImportDataGeoInfo"
+        <p:dialog header="Importar Dados (arquivos compactados *.zip)" 
+                  widgetVar="dlgImportData"
                   appendTo="@(body)"
                   width="800"
                   height="600"
@@ -154,49 +150,45 @@
             
             <p:ajax event="close" 
                     listener="#{importDataBean.fecharImportacao}"
-                    update=":form-import-data-geoinfo:pgrid-import-data-geoinfo"/>
+                    update=":form-import-data:pgrid-import-data"
+                    oncomplete="pararPollImportData();"/>
             
             <p:scrollPanel mode="native"
                            style="width: 100%; height: 200px;">
-                <p:fileUpload id="fileup-import-data-geoinfo"
-                              fileUploadListener="#{importDataBean.importarCSV}" 
+                <p:fileUpload id="fileup-import-data"
+                              fileUploadListener="#{importDataBean.importar}" 
                               mode="advanced" 
                               dragDropSupport="true"  
-                              multiple="true" 
-                              allowTypes="/(\.|\/)(geoinfo)$/"
-                              invalidFileMessage="Tipo de arquivo inválido! Somente são aceitos arquivos com extensão GeoInfo!"
+                              multiple="false" 
+                              allowTypes="/(\.|\/)(zip)$/"
+                              invalidFileMessage="Tipo de arquivo inválido! Somente são aceitos arquivos compactados com extensão ZIP!"
                               invalidSizeMessage="Tamanho de arquivo excedido!"
                               cancelLabel="Cancelar"
-                              uploadLabel="Carregar"
+                              uploadLabel="Importar"
                               label="Arquivo"
-                              update=":form-message:growl-message :form-import-data-geoinfo:pgrid-import-data-geoinfo">
+                              update=":form-message:growl-message :form-import-data:pgrid-import-data"
+                              onstart="iniciarPollImportData();"
+                              oncomplete="pararPollImportData();">
                 </p:fileUpload>   
             </p:scrollPanel>
             
-            <p:commandButton value="Importar Dados"  
-                             style="height: 32px; width: 150px; margin-top: 2px;">
-                <p:ajax event="click"
-                        listener="#{importDataBean.importarListaCSV()}"
-                        update=":form-message:growl-message :form-import-data-geoinfo:pgrid-import-data-geoinfo"/>
-            </p:commandButton>
-            
             <h:panelGrid columns="1"
-                         id="pgrid-import-data-geoinfo"
+                         id="pgrid-import-data"
                          style="width: 100%">
                 
                 <p:progressBar displayOnly="true"
-                               id="pbar-import-data-geoinfo"
-                               widgetVar="pbarImportDataGeoInfo"
+                               id="pbar-import-data"
+                               widgetVar="pbarImportData"
                                labelTemplate="{value}%"
                                value="#{importDataBean.pcProgresso}"
                                style="margin-top: 6px; margin-bottom: 6px;">
                 </p:progressBar> 
                 
-                <h:outputText id="otext-import-data-geoinfo" 
+                <h:outputText id="otext-import-data" 
                               value="#{importDataBean.dsMensagem}"/>
                 
-                <p:dataTable id="dtable-import-data-geoinfo-log"
-                             widgetVar="dTableImportDataGeoInfoLog"
+                <p:dataTable id="dtable-import-data-log"
+                             widgetVar="dTableImportDataLog"
                              value="#{importDataBean.listaGeoInfoLogNode}"
                              var="logItem"
                              scrollable="true"
@@ -221,7 +213,9 @@
                 </p:dataTable>
                 
                 <h:panelGroup>
-                    <h:outputText value="Para ver como montar o arquivo, consulte o "/>
+                    <h:outputText value="A rotina de importação aceita arquivos compactados (*.zip) de
+                                         arquivos de Nota Fiscal Eletrônica (NF-e ou NFC-e) e arquivos CSV
+                                         GeoInfo. Para ver como montar o arquivo CSV GeoInfo, consulte o "/>
                     <h:outputLink value="https://docs.google.com/document/d/1WTtvJTa29_3t_HzyccmJ-K_5ZCgzfkWs4riNPZatyzM/edit?usp=sharing"
                                   target="_new">
                         <h:outputText value="Manual"/>

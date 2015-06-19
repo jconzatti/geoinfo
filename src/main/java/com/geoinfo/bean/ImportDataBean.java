@@ -8,6 +8,9 @@ import com.geoinfo.factory.ImportDataGeoInfoCSVFactory;
 import com.geoinfo.model.GeoInfoLogNode;
 import com.geoinfo.util.EGeoInfoLogType;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
@@ -15,12 +18,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.jdom.JDOMException;
@@ -81,6 +88,128 @@ public class ImportDataBean implements Serializable{
 
     public void setListaEGeoInfoLogType(List<EGeoInfoLogType> listaEGeoInfoLogType) {
         this.listaEGeoInfoLogType = listaEGeoInfoLogType;
+    }
+    
+    public void importar(FileUploadEvent fuEvent){
+        this.listaGeoInfoLogNode.clear();
+        
+        this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Inicio do processo."));
+        
+        FacesContext fc = FacesContext.getCurrentInstance();
+        if(fuEvent != null){
+            UploadedFile uFile = fuEvent.getFile();
+            if(uFile != null){
+                String dsFileName = uFile.getFileName();
+                if(dsFileName.toLowerCase().endsWith(".zip")){
+                    this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Upload do arquivo: " + dsFileName));
+                    
+                    File file = new File("http://localhost:8080/GeoInfo/resources/upload/upload.properties");  
+                    if(file.exists()) 
+                        this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Arquivo existe!"));
+                    else
+                        this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Arquivo não existe!"));
+
+                    try {
+                        ZipInputStream zin = new ZipInputStream(uFile.getInputstream());
+                        ZipEntry ze;
+                        while ((ze = zin.getNextEntry()) != null) {
+                            this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Unzipping " + ze.getName()));
+                            zin.closeEntry();
+                        }
+                        zin.close();
+                        this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, dsFileName));
+
+                        FacesMessage fm = new FacesMessage("ZIP ZIP!!! " + dsFileName);
+                        fm.setSeverity(FacesMessage.SEVERITY_INFO);
+                        fc.addMessage(null, fm);
+                        /*File arquivo = null;
+                        InputStream is = null;
+                        OutputStream os = null;
+                        byte[] buffer = new byte[TAMANHO_BUFFER];
+                        try {
+                        //cria diretório informado, caso não exista
+                        if( !diretorio.exists() ) {
+                        diretorio.mkdirs();
+                        }
+                        if( !diretorio.exists() || !diretorio.isDirectory() ) {
+                        throw new IOException("Informe um diretório válido");
+                        }
+                        zip = new ZipFile( arquivoZip );
+                        Enumeration e = zip.entries();
+                        while( e.hasMoreElements() ) {
+                        ZipEntry entrada = (ZipEntry) e.nextElement();
+                        arquivo = new File( diretorio, entrada.getName() );
+                        //se for diretório inexistente, cria a estrutura
+                        //e pula pra próxima entrada
+                        if( entrada.isDirectory() && !arquivo.exists() ) {
+                        arquivo.mkdirs();
+                        continue;
+                        }
+                        //se a estrutura de diretórios não existe, cria
+                        if( !arquivo.getParentFile().exists() ) {
+                        arquivo.getParentFile().mkdirs();
+                        }
+                        try {
+                        //lê o arquivo do zip e grava em disco
+                        is = zip.getInputStream( entrada );
+                        os = new FileOutputStream( arquivo );
+                        int bytesLidos = 0;
+                        if( is == null ) {
+                        throw new ZipException("Erro ao ler a entrada do zip: "+entrada.getName());
+                        }
+                        while( (bytesLidos = is.read( buffer )) > 0 ) {
+                        os.write( buffer, 0, bytesLidos );
+                        }
+                        } finally {
+                        if( is != null ) {
+                        try {
+                        is.close();
+                        } catch( Exception ex ) {}
+                        }
+                        if( os != null ) {
+                        try {
+                        os.close();
+                        } catch( Exception ex ) {}
+                        }
+                        }
+                        }
+                        } finally {
+                        if( zip != null ) {
+                        try {
+                        zip.close();
+                        } catch( Exception e ) {}
+                        }
+                        } */
+                    } catch (IOException ex) {
+                        this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, "Erro na importação de arquivo! " + ex.getMessage()));
+
+                        FacesMessage fm = new FacesMessage("Erro na importação de arquivo! " + ex.getMessage());
+                        fm.setSeverity(FacesMessage.SEVERITY_ERROR);
+                        fc.addMessage(null, fm);
+                    }
+                }else{
+                    this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Tipo de arquivo inválido para upload! O arquivo deve ser compactado com extenção ZIP!"));
+
+                    FacesMessage fm = new FacesMessage("Tipo de arquivo inválido para upload! O arquivo deve ser compactado com extenção ZIP!");
+                    fm.setSeverity(FacesMessage.SEVERITY_ERROR);
+                    fc.addMessage(null, fm);
+                } 
+            }else{
+                this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Arquivo inválido para upload! Arquivo nulo!"));
+
+                FacesMessage fm = new FacesMessage("Arquivo inválido para upload! Arquivo nulo!");
+                fm.setSeverity(FacesMessage.SEVERITY_ERROR);
+                fc.addMessage(null, fm);
+            }
+        }else{
+            this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Evendo de upload inválido! Evento nulo!"));
+
+            FacesMessage fm = new FacesMessage("Evendo de upload inválido! Evento nulo!");
+            fm.setSeverity(FacesMessage.SEVERITY_ERROR);
+            fc.addMessage(null, fm);
+        } 
+        
+        this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Fim do processo."));
     }
     
     public void importarCSV(FileUploadEvent fileUploaded){
