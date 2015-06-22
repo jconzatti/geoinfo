@@ -103,13 +103,14 @@ public class ImportDataBean implements Serializable{
                 if(dsFileName.toLowerCase().endsWith(".zip")){
                     this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Upload do arquivo: " + dsFileName));
                     
-                    File file = new File("http://localhost:8080/GeoInfo/resources/upload/upload.properties");  
-                    if(file.exists()) 
-                        this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Arquivo existe!"));
-                    else
-                        this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Arquivo não existe!"));
-
                     try {
+                        File file = new File(".\\upload"); 
+                        String sPath = file.getAbsolutePath();
+                        if(file.exists()) 
+                            this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Arquivo existe! " + sPath));
+                        else
+                            this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Arquivo não existe! " + sPath));
+
                         ZipInputStream zin = new ZipInputStream(uFile.getInputstream());
                         ZipEntry ze;
                         while ((ze = zin.getNextEntry()) != null) {
