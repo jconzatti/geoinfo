@@ -8,7 +8,6 @@
     <h:outputScript>
         var inLoginVisible = false;
         var inPollImportDataIniciado = false;
-        var inPollImportDataNFeIniciado = false;
         
         function onClickDsSenha(event){
             if (event.keyCode === 13) { 
@@ -40,29 +39,11 @@
             PF('pollImportData').stop();
         }
         
-        function iniciarPollImportDataNFe(){
-            inPollImportDataNFeIniciado = true;
-            PF('pollImportDataNFe').start();
-        }
-        
-        function pararPollImportDataNFe(){
-            inPollImportDataNFeIniciado = false;
-            PF('pollImportDataNFe').stop();
-        }
-        
         function onImportData(data){
             if(data.status === "begin"){
                 iniciarPollImportInfo();
             }else if(data.status === "success"){
                 pararPollImportData();
-            }
-        }
-        
-        function onImportDataNFe(data){
-            if(data.status === "begin"){
-                iniciarPollImportDataNFe();
-            }else if(data.status === "success"){
-                pararPollImportDataNFe();
             }
         }
     </h:outputScript>
@@ -130,11 +111,6 @@
                 interval="1" 
                 update=":form-import-data:pgrid-import-data" 
                 widgetVar="pollImportData"/>
-        
-        <p:poll autoStart="false" 
-                interval="1" 
-                update=":form-import-data-nfe:pgrid-import-data-nfe" 
-                widgetVar="pollImportDataNFe"/>
     </h:form>
     
     <h:form id="form-import-data"
@@ -219,87 +195,6 @@
                         <h:outputText value="Manual"/>
                     </h:outputLink>
                 </h:panelGroup>
-            </h:panelGrid>
-        </p:dialog>    
-    </h:form>
-    
-    <h:form id="form-import-data-nfe"
-            enctype="multipart/form-data">
-        <p:dialog header="Importar Dados via Arquivo NF-e (XML)" 
-                  widgetVar="dlgImportDataNFe"
-                  appendTo="@(body)"
-                  width="800"
-                  height="600"
-                  minimizable="true">
-            <p:ajax event="close" 
-                    listener="#{importDataBean.fecharImportacao}"
-                    update=":form-import-data-nfe:pgrid-import-data-nfe"
-                    oncomplete="pararPollImportDataNFe();"/>
-            <p:scrollPanel mode="native" 
-                           style="width: 100%; height: 200px;">
-                <p:fileUpload id="fileup-import-data-nfe"
-                              fileUploadListener="#{importDataBean.importarXMLNFe}" 
-                              mode="advanced" 
-                              dragDropSupport="true"  
-                              multiple="true" 
-                              allowTypes="/(\.|\/)(xml)$/"
-                              invalidFileMessage="Tipo de arquivo inválido! Somente são aceitos arquivos com extensão XML!"
-                              invalidSizeMessage="Tamanho de arquivo excedido!"
-                              cancelLabel="Cancelar"
-                              uploadLabel="Carregar"
-                              label="Arquivo"
-                              update=":form-import-data-nfe:pgrid-import-data-nfe">
-                </p:fileUpload>
-            </p:scrollPanel>
-                
-            <p:commandButton value="Importar Dados"  
-                             style="height: 32px; width: 150px; margin-top: 2px;">
-                <p:ajax event="click"
-                        listener="#{importDataBean.importarListaXMLNFe()}"
-                        update=":form-message:growl-message :form-import-data-nfe:pgrid-import-data-nfe"
-                        onstart="iniciarPollImportDataNFe();"
-                        oncomplete="pararPollImportDataNFe();"/>
-            </p:commandButton>
-            
-            <h:panelGrid columns="1"
-                         id="pgrid-import-data-nfe"
-                         style="width: 100%">
-                
-                <p:progressBar displayOnly="true"
-                               id="pbar-import-data-nfe"
-                               widgetVar="pbarImportDataNFe"
-                               labelTemplate="{value}%"
-                               value="#{importDataBean.pcProgresso}"
-                               style="margin-top: 6px; margin-bottom: 6px;">
-                </p:progressBar> 
-                
-                <h:outputText id="otext-import-data-nfe" 
-                              value="#{importDataBean.dsMensagem}"/>
-                
-                <p:dataTable id="dtable-import-data-nfe-log"
-                             widgetVar="dTableImportDataNFeLog"
-                             value="#{importDataBean.listaGeoInfoLogNode}"
-                             var="logItem"
-                             scrollable="true"
-                             scrollHeight="200"
-                             scrollRows="10"
-                             liveScroll="true"
-                             rendered="#{not empty importDataBean.listaGeoInfoLogNode}"
-                             style="margin-top: 6px; margin-bottom: 6px;">
-                    <p:column headerText="Tipo"
-                              width="55">
-                        <h:outputText value="#{logItem.idLog}" />
-                    </p:column>
-                    <p:column headerText="Data"
-                              sortBy="#{logItem.dtLog}"
-                              width="70">
-                        <h:outputText value="#{logItem.dtLogFormated}" />
-                    </p:column>
-                    <p:column headerText="Mensagem"
-                              width="270">
-                        <h:outputText value="#{logItem.dsMensagem}" />
-                    </p:column>
-                </p:dataTable>
             </h:panelGrid>
         </p:dialog>    
     </h:form>
