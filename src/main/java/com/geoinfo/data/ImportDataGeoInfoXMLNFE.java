@@ -227,16 +227,16 @@ public class ImportDataGeoInfoXMLNFE extends ImportDataGeoInfo{
                                     }else if(dsNome.equals("dhEmi")){
                                         String dtEmissaoNF = e.getText();
                                         try {
-                                            Date dtVenda = new SimpleDateFormat("dd/MM/yyyy").parse(dtEmissaoNF.substring(0, 4) + "/" +
-                                                    dtEmissaoNF.substring(5, 7) + "/" + dtEmissaoNF.substring(8, 10));
+                                            Date dtVenda = new SimpleDateFormat("dd/MM/yyyy").parse(dtEmissaoNF.substring(8, 10) + "/" +
+                                                    dtEmissaoNF.substring(5, 7) + "/" + dtEmissaoNF.substring(0, 4));
                                             venda.setDtVenda(dtVenda);
                                         } catch (ParseException ex) {
                                         }
                                     }else if(dsNome.equals("dEmi")){//para as NFes 2.10 ou inferiores
                                         String dtEmissaoNF = e.getText();
                                         try {
-                                            Date dtVenda = new SimpleDateFormat("dd/MM/yyyy").parse(dtEmissaoNF.substring(0, 4) + "/" +
-                                                    dtEmissaoNF.substring(5, 7) + "/" + dtEmissaoNF.substring(8, 10));
+                                            Date dtVenda = new SimpleDateFormat("dd/MM/yyyy").parse(dtEmissaoNF.substring(8, 10) + "/" +
+                                                    dtEmissaoNF.substring(5, 7) + "/" + dtEmissaoNF.substring(0, 4));
                                             venda.setDtVenda(dtVenda);
                                         } catch (ParseException ex) {
                                         }
@@ -538,133 +538,136 @@ public class ImportDataGeoInfoXMLNFE extends ImportDataGeoInfo{
                                                                         nItem++;
                                                                         eNFe = getChildElement(eInfNFe, "det", "nItem", String.valueOf(nItem));
                                                                         if(eNFe != null){
-                                                                            ProdutoPK produtoPK = new ProdutoPK();
-                                                                            Produto produto = new Produto();
-                                                                            produto.setProdutoPK(produtoPK);
-                                                                            produto.getProdutoPK().setGerente(this.getGerente());
-                                                                            
-                                                                            
-                                                                            ItemVendaPK itemVendaPK = new ItemVendaPK();
-                                                                            ItemVenda itemVenda = new ItemVenda();
-                                                                            itemVenda.setItemVendaPK(itemVendaPK);
-                                                                            itemVenda.getItemVendaPK().setVenda(venda);
-                                                                            itemVenda.getItemVendaPK().setCdItemVenda(nItem);
-                                                                            
-                                                                            double vlTotalItem = 0;
-                                                                            int cdCFOP = 0;
-                                                                            i = eNFe.getChildren().iterator();
-                                                                            while(i.hasNext()){
-                                                                                Element e = (Element) i.next();
-                                                                                String dsNome = e.getName();
-                                                                                if(dsNome.equals("cProd")){
-                                                                                    produto.getProdutoPK().setCdProduto(e.getText());
-                                                                                }else if(dsNome.equals("xProd")){
-                                                                                    produto.setDsProduto(e.getText());
-                                                                                }else if(dsNome.equals("qCom")){
-                                                                                    itemVenda.setQtProduto(Double.parseDouble(e.getText()));
-                                                                                }else if(dsNome.equals("CFOP")){
-                                                                                    cdCFOP = Integer.parseInt(e.getText());
-                                                                                }else if(dsNome.equals("vDesc")){
-                                                                                    vlDesconto += Double.parseDouble(e.getText());
-                                                                                }else if(dsNome.equals("vProd")){
-                                                                                    vlTotalItem += Double.parseDouble(e.getText());
-                                                                                }else if(dsNome.equals("vFrete")){
-                                                                                    vlTotalItem += Double.parseDouble(e.getText());
-                                                                                }else if(dsNome.equals("vSeg")){
-                                                                                    vlTotalItem += Double.parseDouble(e.getText());
-                                                                                }else if(dsNome.equals("vOutro")){
-                                                                                    vlTotalItem += Double.parseDouble(e.getText());
+                                                                            Element eProdNFe = getChildElement(eNFe, "prod");
+                                                                            if(eProdNFe != null){
+                                                                                ProdutoPK produtoPK = new ProdutoPK();
+                                                                                Produto produto = new Produto();
+                                                                                produto.setProdutoPK(produtoPK);
+                                                                                produto.getProdutoPK().setGerente(this.getGerente());
+
+
+                                                                                ItemVendaPK itemVendaPK = new ItemVendaPK();
+                                                                                ItemVenda itemVenda = new ItemVenda();
+                                                                                itemVenda.setItemVendaPK(itemVendaPK);
+                                                                                itemVenda.getItemVendaPK().setVenda(venda);
+                                                                                itemVenda.getItemVendaPK().setCdItemVenda(nItem);
+
+                                                                                double vlTotalItem = 0;
+                                                                                int cdCFOP = 0;
+                                                                                i = eProdNFe.getChildren().iterator();
+                                                                                while(i.hasNext()){
+                                                                                    Element e = (Element) i.next();
+                                                                                    String dsNome = e.getName();
+                                                                                    if(dsNome.equals("cProd")){
+                                                                                        produto.getProdutoPK().setCdProduto(e.getText());
+                                                                                    }else if(dsNome.equals("xProd")){
+                                                                                        produto.setDsProduto(e.getText());
+                                                                                    }else if(dsNome.equals("qCom")){
+                                                                                        itemVenda.setQtProduto(Double.parseDouble(e.getText()));
+                                                                                    }else if(dsNome.equals("CFOP")){
+                                                                                        cdCFOP = Integer.parseInt(e.getText());
+                                                                                    }else if(dsNome.equals("vDesc")){
+                                                                                        vlDesconto += Double.parseDouble(e.getText());
+                                                                                    }else if(dsNome.equals("vProd")){
+                                                                                        vlTotalItem += Double.parseDouble(e.getText());
+                                                                                    }else if(dsNome.equals("vFrete")){
+                                                                                        vlTotalItem += Double.parseDouble(e.getText());
+                                                                                    }else if(dsNome.equals("vSeg")){
+                                                                                        vlTotalItem += Double.parseDouble(e.getText());
+                                                                                    }else if(dsNome.equals("vOutro")){
+                                                                                        vlTotalItem += Double.parseDouble(e.getText());
+                                                                                    }
                                                                                 }
-                                                                            }
-                                                                            
-                                                                            if(listaCFOPConsiderada.contains(cdCFOP)){
-                                                                                Element eImpNFe = getChildElement(eNFe, "imposto");
-                                                                                if(eImpNFe != null){
-                                                                                    Element eImp2NFe = getChildElement(eImpNFe, "ICMS");
-                                                                                    if(eImp2NFe != null){
-                                                                                        Element eImp3NFe = getChildElement(eImp2NFe, "ICMS10");
-                                                                                        if(eImp3NFe==null)
-                                                                                            eImp3NFe = getChildElement(eImp2NFe, "ICMS30");
-                                                                                        if(eImp3NFe==null)
-                                                                                            eImp3NFe = getChildElement(eImp2NFe, "ICMS70");
-                                                                                        if(eImp3NFe==null)
-                                                                                            eImp3NFe = getChildElement(eImp2NFe, "ICMS90");
-                                                                                        if(eImp3NFe==null)
-                                                                                            eImp3NFe = getChildElement(eImp2NFe, "ICMSPart");
-                                                                                        if(eImp3NFe==null)
-                                                                                            eImp3NFe = getChildElement(eImp2NFe, "ICMSSN201");
-                                                                                        if(eImp3NFe==null)
-                                                                                            eImp3NFe = getChildElement(eImp2NFe, "ICMSSN202");
-                                                                                        if(eImp3NFe==null)
-                                                                                            eImp3NFe = getChildElement(eImp2NFe, "ICMSSN900");
-                                                                                        
-                                                                                        if(eImp3NFe!=null){
-                                                                                            i = eImp3NFe.getChildren().iterator();
+
+                                                                                if(listaCFOPConsiderada.contains(cdCFOP)){
+                                                                                    Element eImpNFe = getChildElement(eNFe, "imposto");
+                                                                                    if(eImpNFe != null){
+                                                                                        Element eImp2NFe = getChildElement(eImpNFe, "ICMS");
+                                                                                        if(eImp2NFe != null){
+                                                                                            Element eImp3NFe = getChildElement(eImp2NFe, "ICMS10");
+                                                                                            if(eImp3NFe==null)
+                                                                                                eImp3NFe = getChildElement(eImp2NFe, "ICMS30");
+                                                                                            if(eImp3NFe==null)
+                                                                                                eImp3NFe = getChildElement(eImp2NFe, "ICMS70");
+                                                                                            if(eImp3NFe==null)
+                                                                                                eImp3NFe = getChildElement(eImp2NFe, "ICMS90");
+                                                                                            if(eImp3NFe==null)
+                                                                                                eImp3NFe = getChildElement(eImp2NFe, "ICMSPart");
+                                                                                            if(eImp3NFe==null)
+                                                                                                eImp3NFe = getChildElement(eImp2NFe, "ICMSSN201");
+                                                                                            if(eImp3NFe==null)
+                                                                                                eImp3NFe = getChildElement(eImp2NFe, "ICMSSN202");
+                                                                                            if(eImp3NFe==null)
+                                                                                                eImp3NFe = getChildElement(eImp2NFe, "ICMSSN900");
+
+                                                                                            if(eImp3NFe!=null){
+                                                                                                i = eImp3NFe.getChildren().iterator();
+                                                                                                while(i.hasNext()){
+                                                                                                    Element e = (Element) i.next();
+                                                                                                    String dsNome = e.getName();
+                                                                                                    if(dsNome.equals("vICMSST")){
+                                                                                                        vlTotalItem += Double.parseDouble(e.getText());
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        }
+
+                                                                                        eImp2NFe = getChildElement(eImpNFe, "IPI");
+                                                                                        if(eImp2NFe != null){
+                                                                                            Element eImp3NFe = getChildElement(eImp2NFe, "IPITrib");
+
+                                                                                            if(eImp3NFe!=null){
+                                                                                                i = eImp3NFe.getChildren().iterator();
+                                                                                                while(i.hasNext()){
+                                                                                                    Element e = (Element) i.next();
+                                                                                                    String dsNome = e.getName();
+                                                                                                    if(dsNome.equals("vIPI")){
+                                                                                                        vlTotalItem += Double.parseDouble(e.getText());
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        }
+
+                                                                                        eImp2NFe = getChildElement(eImpNFe, "II");
+                                                                                        if(eImp2NFe != null){
+                                                                                            i = eImp2NFe.getChildren().iterator();
                                                                                             while(i.hasNext()){
                                                                                                 Element e = (Element) i.next();
                                                                                                 String dsNome = e.getName();
-                                                                                                if(dsNome.equals("vICMSST")){
+                                                                                                if(dsNome.equals("vII")){
                                                                                                     vlTotalItem += Double.parseDouble(e.getText());
                                                                                                 }
                                                                                             }
                                                                                         }
                                                                                     }
-                                                                                    
-                                                                                    eImp2NFe = getChildElement(eImpNFe, "IPI");
-                                                                                    if(eImp2NFe != null){
-                                                                                        Element eImp3NFe = getChildElement(eImp2NFe, "IPITrib");
-                                                                                        
-                                                                                        if(eImp3NFe!=null){
-                                                                                            i = eImp3NFe.getChildren().iterator();
-                                                                                            while(i.hasNext()){
-                                                                                                Element e = (Element) i.next();
-                                                                                                String dsNome = e.getName();
-                                                                                                if(dsNome.equals("vIPI")){
-                                                                                                    vlTotalItem += Double.parseDouble(e.getText());
-                                                                                                }
-                                                                                            }
+
+                                                                                    ProdutoRepository produtoRepository = new ProdutoRepository(this.getEntityManager());
+                                                                                    Produto p = produtoRepository.find(produto.getProdutoPK());
+                                                                                    if(p==null){
+                                                                                        produtoRepository.insert(produto);
+                                                                                    }else{
+                                                                                        if(!produto.getDsProduto().equals(p.getDsProduto())){
+                                                                                            produtoRepository.edit(produto);
                                                                                         }
                                                                                     }
-                                                                                    
-                                                                                    eImp2NFe = getChildElement(eImpNFe, "II");
-                                                                                    if(eImp2NFe != null){
-                                                                                        i = eImp2NFe.getChildren().iterator();
-                                                                                        while(i.hasNext()){
-                                                                                            Element e = (Element) i.next();
-                                                                                            String dsNome = e.getName();
-                                                                                            if(dsNome.equals("vII")){
-                                                                                                vlTotalItem += Double.parseDouble(e.getText());
-                                                                                            }
-                                                                                        }
+
+                                                                                    double vlUnitarioItem = 0;
+                                                                                    if((vlTotalItem > 0)&&(itemVenda.getQtProduto() > 0)){
+                                                                                        vlUnitarioItem = vlTotalItem/itemVenda.getQtProduto();
                                                                                     }
-                                                                                }
-                                                                                
-                                                                                ProdutoRepository produtoRepository = new ProdutoRepository(this.getEntityManager());
-                                                                                Produto p = produtoRepository.find(produto.getProdutoPK());
-                                                                                if(p==null){
-                                                                                    produtoRepository.insert(produto);
-                                                                                }else{
-                                                                                    if(!produto.getDsProduto().equals(p.getDsProduto())){
-                                                                                        produtoRepository.edit(produto);
+                                                                                    itemVenda.setProduto(produto);
+                                                                                    itemVenda.setVlProduto(vlUnitarioItem);
+
+                                                                                    venda.setVlDesconto(vlDesconto);
+                                                                                    vendaRepository.edit(venda);
+
+                                                                                    ItemVendaRepository itemVendaRepository = new ItemVendaRepository(this.getEntityManager());
+                                                                                    ItemVenda iv = itemVendaRepository.find(itemVenda.getItemVendaPK());
+                                                                                    if(iv==null){
+                                                                                        itemVendaRepository.insert(itemVenda);
+                                                                                    }else{
+                                                                                        itemVendaRepository.edit(itemVenda);
                                                                                     }
-                                                                                }
-                                                                                
-                                                                                double vlUnitarioItem = 0;
-                                                                                if((vlTotalItem > 0)&&(itemVenda.getQtProduto() > 0)){
-                                                                                    vlUnitarioItem = vlTotalItem/itemVenda.getQtProduto();
-                                                                                }
-                                                                                itemVenda.setProduto(produto);
-                                                                                itemVenda.setVlProduto(vlUnitarioItem);
-                                                                                
-                                                                                venda.setVlDesconto(vlDesconto);
-                                                                                vendaRepository.edit(venda);
-                                                                                
-                                                                                ItemVendaRepository itemVendaRepository = new ItemVendaRepository(this.getEntityManager());
-                                                                                ItemVenda iv = itemVendaRepository.find(itemVenda.getItemVendaPK());
-                                                                                if(iv==null){
-                                                                                    itemVendaRepository.insert(itemVenda);
-                                                                                }else{
-                                                                                    itemVendaRepository.edit(itemVenda);
                                                                                 }
                                                                             }
                                                                         }
