@@ -1,6 +1,7 @@
 package com.geoinfo.model;
 
 import com.geoinfo.entity.Fato;
+import com.geoinfo.entity.Pessoa;
 import com.geoinfo.exception.ObjetoFatoBuilderException;
 import com.geoinfo.factory.EObjetoFatoGroupByFactory;
 import com.geoinfo.util.EObjetoFatoGroupBy;
@@ -15,8 +16,10 @@ public class ListaObjetoFato<T extends IGroupable> {
     private final List<ObjetoFato<T>> listaObjetoFato;
 
     public static ListaObjetoFato create(List<Fato> listaFato, 
-            PeriodoIntervaloComparavel periodoIntervaloComparavel, EntityManager entityManager, 
-            Class<? extends IGroupable> classObjetoFatoBuilder) throws ObjetoFatoBuilderException {
+            PeriodoIntervaloComparavel periodoIntervaloComparavel, 
+            EntityManager entityManager, 
+            Class<? extends IGroupable> classObjetoFatoBuilder,
+            Pessoa pessoaLogada) throws ObjetoFatoBuilderException {
         
         EObjetoFatoGroupBy idObjetoFatoGroupBy = EObjetoFatoGroupByFactory.create(classObjetoFatoBuilder);
         

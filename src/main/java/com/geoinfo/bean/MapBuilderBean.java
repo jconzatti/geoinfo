@@ -178,6 +178,7 @@ public class MapBuilderBean implements Serializable{
         HttpSession hs = (HttpSession) ec.getSession(false);
         List<Fato> listaFato = (List<Fato>)hs.getAttribute("listaFato");
         PeriodoIntervaloComparavel periodoIntervaloComparavel = (PeriodoIntervaloComparavel)hs.getAttribute("periodoIntervaloComparavel");
+        Pessoa pessoaLogada = (Pessoa) hs.getAttribute("pessoaLogada");
         
         HttpServletRequest hsr = (HttpServletRequest) ec.getRequest();
         EntityManager entityManager = (EntityManager)hsr.getAttribute("entityManager");
@@ -186,7 +187,7 @@ public class MapBuilderBean implements Serializable{
             try{
                 idProgressoPais = new Long(1);
 
-                scriptMapBuilderPais = new ScriptMapCreator<Pais>(listaFato, periodoIntervaloComparavel, entityManager, Pais.class);
+                scriptMapBuilderPais = new ScriptMapCreator<Pais>(listaFato, periodoIntervaloComparavel, entityManager, Pais.class, pessoaLogada);
                 dsTitulo = scriptMapBuilderPais.getListaObjetoFato().getLista().get(0).getDsTitulo();
                 legendaPais = scriptMapBuilderPais.getListaObjetoFato().getLista().get(0).getLegenda();
                 listaObjetoFatoPais = scriptMapBuilderPais.getListaObjetoFato().getLista();
@@ -195,7 +196,7 @@ public class MapBuilderBean implements Serializable{
                 idProgressoPais = new Long(2);
                 idProgressoEstado = new Long(1);
 
-                scriptMapBuilderEstado = new ScriptMapCreator<Estado>(listaFato, periodoIntervaloComparavel, entityManager, Estado.class);
+                scriptMapBuilderEstado = new ScriptMapCreator<Estado>(listaFato, periodoIntervaloComparavel, entityManager, Estado.class, pessoaLogada);
                 legendaEstado = scriptMapBuilderEstado.getListaObjetoFato().getLista().get(0).getLegenda();
                 listaObjetoFatoEstado = scriptMapBuilderEstado.getListaObjetoFato().getLista();
                 listaEstado = scriptMapBuilderEstado.getListaRegiaoGeograficaPoligonal();
@@ -203,7 +204,7 @@ public class MapBuilderBean implements Serializable{
                 idProgressoEstado = new Long(2);
                 idProgressoCidade = new Long(1);
 
-                scriptMapBuilderCidade = new ScriptMapCreator<Cidade>(listaFato, periodoIntervaloComparavel, entityManager, Cidade.class);
+                scriptMapBuilderCidade = new ScriptMapCreator<Cidade>(listaFato, periodoIntervaloComparavel, entityManager, Cidade.class, pessoaLogada);
                 legendaCidade = scriptMapBuilderCidade.getListaObjetoFato().getLista().get(0).getLegenda();
                 listaObjetoFatoCidade = scriptMapBuilderCidade.getListaObjetoFato().getLista();
                 listaCidade = scriptMapBuilderCidade.getListaRegiaoGeograficaPoligonal();
@@ -545,13 +546,13 @@ public class MapBuilderBean implements Serializable{
         }
 
         public ScriptMapCreator(List<Fato> listaFato, PeriodoIntervaloComparavel periodoIntervaloComparavel, 
-                    EntityManager entityManager, Class<T> classScript) throws ObjetoFatoBuilderException{
+                    EntityManager entityManager, Class<T> classScript, Pessoa pessoaLogada) throws ObjetoFatoBuilderException{
             inConstruiu = false;
             dsScriptMap = "";
             pcProgresso = new Long(0);
 
             dsClassScript = classScript.getSimpleName();
-            listaObjetoFato = ListaObjetoFato.create(listaFato, periodoIntervaloComparavel, entityManager, classScript);
+            listaObjetoFato = ListaObjetoFato.create(listaFato, periodoIntervaloComparavel, entityManager, classScript, pessoaLogada);
             Repository repository = RepositoryFactory.createByGroupable(classScript, entityManager);
             rgps = new RegiaoGeograficaPoligonalSettings(classScript);
 
