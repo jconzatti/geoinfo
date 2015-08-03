@@ -98,141 +98,235 @@ public class ImportDataBean implements Serializable{
                     
                     try {
                         File file = new File("C:\\Projetos\\@DataFor\\GeoInfo\\upload\\" + dsFileName); 
-                        file.getParentFile().mkdirs();
-                        file.createNewFile();
-                        
-                        FileOutputStream fos = new FileOutputStream(file);  
-                        
-                        int read;
-                        byte[] bytes = new byte[1024];
-                        InputStream is = uFile.getInputstream();
-                        while ((read = is.read(bytes)) != -1) {
-                            fos.write(bytes, 0, read);
-                        } 
-                        fos.flush();  
-                        fos.close();
-                        
-                        this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Arquivo salvo em " + file.getAbsolutePath()));
-                        
-                        List<ZipEntry> listaZEGeoInfo = new ArrayList<ZipEntry>();
-                        List<ZipEntry> listaZEGeoInfoVenda = new ArrayList<ZipEntry>();
-                        List<ZipEntry> listaZEXMLNFE = new ArrayList<ZipEntry>();
-                        
-                        ZipFile zipFile = new ZipFile(file);
-                        Enumeration e = zipFile.entries();
-                        while (e.hasMoreElements()){
-                            ZipEntry zipEntry = (ZipEntry) e.nextElement();
-                            
-                            if(!zipEntry.isDirectory()){
-                                String dsZEName = zipEntry.getName();
-                                
-                                this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Extraindo " + dsZEName));
-                                if(dsZEName.toLowerCase().endsWith(".geoinfo")){
-                                    if(dsZEName.toLowerCase().startsWith("venda"))
-                                        listaZEGeoInfoVenda.add(zipEntry);
-                                    else 
-                                        listaZEGeoInfo.add(zipEntry);
-                                }else{
-                                    if(dsZEName.toLowerCase().endsWith(".xml")){
-                                        listaZEXMLNFE.add(zipEntry);
-                                    }
+                        boolean inDiretorioExiste = file.getParentFile().exists();
+                        if (!inDiretorioExiste)
+                            inDiretorioExiste = file.getParentFile().mkdirs();
+                        if(inDiretorioExiste){
+                            if (file.createNewFile()){
+
+                                FileOutputStream fos = new FileOutputStream(file);  
+
+                                int read;
+                                byte[] bytes = new byte[1024];
+                                InputStream is = uFile.getInputstream();
+                                while ((read = is.read(bytes)) != -1) {
+                                    fos.write(bytes, 0, read);
                                 } 
-                            }
-                        }
-                        
-                        listaZEGeoInfo.addAll(listaZEGeoInfoVenda);
-                        
-                        if((listaZEGeoInfo.size() > 0) || (listaZEXMLNFE.size() > 0)){
-                            this.inFechouImportacao = false;
+                                fos.flush();  
+                                fos.close();
 
-                            ExternalContext ec = fc.getExternalContext();
+                                this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Arquivo salvo em " + file.getAbsolutePath()));
 
-                            HttpSession hs = (HttpSession) ec.getSession(false);
-                            Pessoa pessoaLogada = (Pessoa) hs.getAttribute("pessoaLogada");
-                            if(pessoaLogada instanceof PessoaMaster){
-                                HttpServletRequest hsr = (HttpServletRequest) ec.getRequest();
+                                List<ZipEntry> listaZEGeoInfo = new ArrayList<ZipEntry>();
+                                List<ZipEntry> listaZEGeoInfoVenda = new ArrayList<ZipEntry>();
+                                List<ZipEntry> listaZEXMLNFE = new ArrayList<ZipEntry>();
 
-                                EntityManager entityManager = (EntityManager)hsr.getAttribute("entityManager");
-                                PessoaMaster pessoaGerente = pessoaLogada.getGerente();
-                                if(pessoaGerente == null){
-                                    pessoaGerente = (PessoaMaster) pessoaLogada;
-                                }
+                                ZipFile zipFile = new ZipFile(file);
+                                Enumeration e = zipFile.entries();
+                                while (e.hasMoreElements()){
+                                    ZipEntry zipEntry = (ZipEntry) e.nextElement();
 
-                                this.dsMensagem = "Contando registros a serem importadas!";
+                                    if(!zipEntry.isDirectory()){
+                                        String dsZEName = zipEntry.getName();
 
-                                Long nrRegistroTotal = (long) listaZEXMLNFE.size();
-                                Iterator itZE = listaZEGeoInfo.iterator();
-                                while((itZE.hasNext())&&(!this.inFechouImportacao)){
-                                    ZipEntry ze = (ZipEntry) itZE.next();
-                                    try {
-                                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(zipFile.getInputStream(ze)));
-
-                                        while(bufferedReader.readLine() != null){
-                                            nrRegistroTotal++;
-                                        }
-
-                                        bufferedReader.close();
-
-                                    } catch (IOException ex) {
-                                        this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, "Erro na leitura do arquivo de importação! " + ex.getMessage()));
-
-                                        FacesMessage fm = new FacesMessage("Erro na importação de arquivo! " + ex.getMessage());
-                                        fm.setSeverity(FacesMessage.SEVERITY_ERROR);
-                                        fc.addMessage(null, fm);
+                                        this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Extraindo " + dsZEName));
+                                        if(dsZEName.toLowerCase().endsWith(".geoinfo")){
+                                            if(dsZEName.toLowerCase().startsWith("venda"))
+                                                listaZEGeoInfoVenda.add(zipEntry);
+                                            else 
+                                                listaZEGeoInfo.add(zipEntry);
+                                        }else{
+                                            if(dsZEName.toLowerCase().endsWith(".xml")){
+                                                listaZEXMLNFE.add(zipEntry);
+                                            }
+                                        } 
                                     }
                                 }
-                                
-                                boolean inErroCommit = false;
-                                Long nrRegistroAtual = (long) 0;
-                                
-                                if(listaZEGeoInfo.size() > 0){
-                                    itZE = listaZEGeoInfo.iterator();
-                                    while((itZE.hasNext())&&(!inErroCommit)&&(!this.inFechouImportacao)){
-                                        ZipEntry ze = (ZipEntry) itZE.next();
 
-                                        String dsArquivo = ze.getName();
-                                        this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Importando arquivo: " + dsArquivo));
+                                listaZEGeoInfo.addAll(listaZEGeoInfoVenda);
 
-                                        ImportDataGeoInfoCSV importDataGeoInfoCSV = ImportDataGeoInfoCSVFactory.createByFileName(dsArquivo, entityManager, pessoaGerente);
+                                if((listaZEGeoInfo.size() > 0) || (listaZEXMLNFE.size() > 0)){
+                                    this.inFechouImportacao = false;
 
-                                        if(importDataGeoInfoCSV != null){
-                                            importDataGeoInfoCSV.setListaGeoInfoLogNode(listaGeoInfoLogNode);
+                                    ExternalContext ec = fc.getExternalContext();
+
+                                    HttpSession hs = (HttpSession) ec.getSession(false);
+                                    Pessoa pessoaLogada = (Pessoa) hs.getAttribute("pessoaLogada");
+                                    if(pessoaLogada instanceof PessoaMaster){
+                                        HttpServletRequest hsr = (HttpServletRequest) ec.getRequest();
+
+                                        EntityManager entityManager = (EntityManager)hsr.getAttribute("entityManager");
+                                        PessoaMaster pessoaGerente = pessoaLogada.getGerente();
+                                        if(pessoaGerente == null){
+                                            pessoaGerente = (PessoaMaster) pessoaLogada;
+                                        }
+                                        
+                                        
+                                        pessoaGerente.isGerente();
+
+                                        this.dsMensagem = "Contando registros a serem importadas!";
+
+                                        Long nrRegistroTotal = (long) listaZEXMLNFE.size();
+                                        Iterator itZE = listaZEGeoInfo.iterator();
+                                        while((itZE.hasNext())&&(!this.inFechouImportacao)){
+                                            ZipEntry ze = (ZipEntry) itZE.next();
                                             try {
                                                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(zipFile.getInputStream(ze)));
 
-                                                entityManager.getTransaction().begin();
+                                                while(bufferedReader.readLine() != null){
+                                                    nrRegistroTotal++;
+                                                }
 
-                                                String dsLinha;
-                                                Long nrLinha = (long) 0;
-                                                while(((dsLinha = bufferedReader.readLine()) != null)&&(!inErroCommit)&&(!this.inFechouImportacao)){
-                                                    nrLinha++;
+                                                bufferedReader.close();
+
+                                            } catch (IOException ex) {
+                                                this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, "Erro na leitura do arquivo de importação! " + ex.getMessage()));
+
+                                                FacesMessage fm = new FacesMessage("Erro na importação de arquivo! " + ex.getMessage());
+                                                fm.setSeverity(FacesMessage.SEVERITY_ERROR);
+                                                fc.addMessage(null, fm);
+                                            }
+                                        }
+
+                                        boolean inErroCommit = false;
+                                        Long nrRegistroAtual = (long) 0;
+
+                                        if(listaZEGeoInfo.size() > 0){
+                                            itZE = listaZEGeoInfo.iterator();
+                                            while((itZE.hasNext())&&(!inErroCommit)&&(!this.inFechouImportacao)){
+                                                ZipEntry ze = (ZipEntry) itZE.next();
+
+                                                String dsArquivo = ze.getName();
+                                                this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Importando arquivo: " + dsArquivo));
+
+                                                ImportDataGeoInfoCSV importDataGeoInfoCSV = ImportDataGeoInfoCSVFactory.createByFileName(dsArquivo, entityManager, pessoaGerente);
+
+                                                if(importDataGeoInfoCSV != null){
+                                                    importDataGeoInfoCSV.setListaGeoInfoLogNode(listaGeoInfoLogNode);
+                                                    try {
+                                                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(zipFile.getInputStream(ze)));
+
+                                                        entityManager.getTransaction().begin();
+
+                                                        String dsLinha;
+                                                        Long nrLinha = (long) 0;
+                                                        while(((dsLinha = bufferedReader.readLine()) != null)&&(!inErroCommit)&&(!this.inFechouImportacao)){
+                                                            nrLinha++;
+                                                            nrRegistroAtual++;
+
+                                                            this.dsMensagem = "Importando linha " + nrLinha + " do arquivo " + dsArquivo;
+
+                                                            double vlProgresso = (nrRegistroAtual.doubleValue()/nrRegistroTotal.doubleValue());
+                                                            this.pcProgresso = Math.round((vlProgresso) * 100);
+
+                                                            importDataGeoInfoCSV.importar(nrLinha, dsLinha);
+
+                                                            if((nrRegistroAtual % 1000) == 0){
+                                                                try{
+                                                                    entityManager.getTransaction().commit();
+                                                                    entityManager.getTransaction().begin();
+                                                                }catch(Exception ex){
+                                                                    inErroCommit = true;
+                                                                    entityManager.getTransaction().rollback();
+
+                                                                    this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, "Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage()));
+
+                                                                    FacesMessage fm = new FacesMessage("Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage());
+                                                                    fm.setSeverity(FacesMessage.SEVERITY_INFO);
+                                                                    fc.addMessage(null, fm);
+                                                                }
+
+                                                            }
+                                                        }
+                                                        bufferedReader.close();
+
+                                                        if(!inErroCommit){
+                                                            try{
+                                                                entityManager.getTransaction().commit();
+
+                                                                if(this.inFechouImportacao){
+                                                                    this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, "Importação de dados finalizada pelo usuário!"));
+
+                                                                    FacesMessage fm = new FacesMessage("Importação de dados finalizada pelo usuário!");
+                                                                    fm.setSeverity(FacesMessage.SEVERITY_WARN);
+                                                                    fc.addMessage(null, fm);
+                                                                }
+                                                            }catch(Exception ex){
+                                                                inErroCommit = true;
+                                                                entityManager.getTransaction().rollback();
+
+                                                                this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, "Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage()));
+
+                                                                FacesMessage fm = new FacesMessage("Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage());
+                                                                fm.setSeverity(FacesMessage.SEVERITY_ERROR);
+                                                                fc.addMessage(null, fm);
+                                                            }
+                                                        }
+
+                                                    } catch (IOException ex) {
+                                                        this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, "Erro na importação de arquivo! " + ex.getMessage()));
+
+                                                        FacesMessage fm = new FacesMessage("Erro na importação de arquivo! " + ex.getMessage());
+                                                        fm.setSeverity(FacesMessage.SEVERITY_ERROR);
+                                                        fc.addMessage(null, fm);
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        if(!this.inFechouImportacao){
+                                            if(listaZEXMLNFE.size() > 0){
+                                                ImportDataGeoInfoXMLNFE importDataGeoInfoXMLNFE = new ImportDataGeoInfoXMLNFE(entityManager, pessoaGerente);
+                                                importDataGeoInfoXMLNFE.setListaGeoInfoLogNode(listaGeoInfoLogNode);
+
+                                                Long nrArquivo = (long) 0;
+                                                itZE = listaZEXMLNFE.iterator();
+                                                while((itZE.hasNext())&&(!inErroCommit)&&(!this.inFechouImportacao)){
+                                                    ZipEntry ze = (ZipEntry)itZE.next();
+
+                                                    nrArquivo++;
                                                     nrRegistroAtual++;
 
-                                                    this.dsMensagem = "Importando linha " + nrLinha + " do arquivo " + dsArquivo;
+                                                    String dsArquivo = ze.getName();
+                                                    this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Importando arquivo: " + dsArquivo));
+
+                                                    this.dsMensagem = "Importando arquivo " + dsArquivo;
 
                                                     double vlProgresso = (nrRegistroAtual.doubleValue()/nrRegistroTotal.doubleValue());
                                                     this.pcProgresso = Math.round((vlProgresso) * 100);
 
-                                                    importDataGeoInfoCSV.importar(nrLinha, dsLinha);
+                                                    try {
+                                                        entityManager.getTransaction().begin();
 
-                                                    if((nrRegistroAtual % 1000) == 0){
-                                                        try{
-                                                            entityManager.getTransaction().commit();
-                                                            entityManager.getTransaction().begin();
-                                                        }catch(Exception ex){
-                                                            inErroCommit = true;
-                                                            entityManager.getTransaction().rollback();
+                                                        importDataGeoInfoXMLNFE.importar(zipFile.getInputStream(ze), true);
 
-                                                            this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, "Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage()));
+                                                        if((nrArquivo % 50) == 0){
+                                                            try{
+                                                                entityManager.getTransaction().commit();
+                                                                entityManager.getTransaction().begin();
+                                                            }catch(Exception ex){
+                                                                inErroCommit = true;
+                                                                entityManager.getTransaction().rollback();
 
-                                                            FacesMessage fm = new FacesMessage("Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage());
-                                                            fm.setSeverity(FacesMessage.SEVERITY_INFO);
-                                                            fc.addMessage(null, fm);
+                                                                this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, "Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage()));
+
+                                                                FacesMessage fm = new FacesMessage("Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage());
+                                                                fm.setSeverity(FacesMessage.SEVERITY_INFO);
+                                                                fc.addMessage(null, fm);
+                                                            }
+
                                                         }
 
+                                                    } catch (IOException ex) {
+                                                        FacesMessage fm = new FacesMessage("Erro na importação de arquivo! " + ex.getMessage());
+                                                        fm.setSeverity(FacesMessage.SEVERITY_ERROR);
+                                                        fc.addMessage(null, fm);
+                                                    } catch (JDOMException ex) {
+                                                        FacesMessage fm = new FacesMessage("Erro na importação de arquivo! " + ex.getMessage());
+                                                        fm.setSeverity(FacesMessage.SEVERITY_ERROR);
+                                                        fc.addMessage(null, fm);
                                                     }
                                                 }
-                                                bufferedReader.close();
 
                                                 if(!inErroCommit){
                                                     try{
@@ -256,122 +350,48 @@ public class ImportDataBean implements Serializable{
                                                         fc.addMessage(null, fm);
                                                     }
                                                 }
-
-                                            } catch (IOException ex) {
-                                                this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, "Erro na importação de arquivo! " + ex.getMessage()));
-
-                                                FacesMessage fm = new FacesMessage("Erro na importação de arquivo! " + ex.getMessage());
-                                                fm.setSeverity(FacesMessage.SEVERITY_ERROR);
-                                                fc.addMessage(null, fm);
                                             }
                                         }
+
+                                        if((!inErroCommit)&&(!this.inFechouImportacao)){
+                                            this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Importação de dados finalizada com sucesso!"));
+
+                                            FacesMessage fm = new FacesMessage("Importação de dados finalizada com sucesso!");
+                                            fm.setSeverity(FacesMessage.SEVERITY_INFO);
+                                            fc.addMessage(null, fm);
+
+                                            this.dsMensagem = "Importação finalizada com sucesso!";
+                                        }else{
+                                            this.dsMensagem = "Importação finalizada!";
+                                        }
+
+                                        this.pcProgresso = new Long(100);
+                                    }else{
+                                        this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "O usuário logado não é um usuário master! Somente usuários do tipo master (Administrador ou Estabelecimento) podem importar arquivos!"));
+
+                                        FacesMessage fm = new FacesMessage("O usuário logado não é um usuário master! Somente usuários do tipo master (Administrador ou Estabelecimento) podem importar arquivos!");
+                                        fm.setSeverity(FacesMessage.SEVERITY_ERROR);
+                                        fc.addMessage(null, fm);
                                     }
-                                }
-                                
-                                if(!this.inFechouImportacao){
-                                    if(listaZEXMLNFE.size() > 0){
-                                        ImportDataGeoInfoXMLNFE importDataGeoInfoXMLNFE = new ImportDataGeoInfoXMLNFE(entityManager, pessoaGerente);
-                                        importDataGeoInfoXMLNFE.setListaGeoInfoLogNode(listaGeoInfoLogNode);
-                                        
-                                        Long nrArquivo = (long) 0;
-                                        itZE = listaZEXMLNFE.iterator();
-                                        while((itZE.hasNext())&&(!inErroCommit)&&(!this.inFechouImportacao)){
-                                            ZipEntry ze = (ZipEntry)itZE.next();
-                                            
-                                            nrArquivo++;
-                                            nrRegistroAtual++;
-                                            
-                                            String dsArquivo = ze.getName();
-                                            this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Importando arquivo: " + dsArquivo));
-                                            
-                                            this.dsMensagem = "Importando arquivo " + dsArquivo;
-                                            
-                                            double vlProgresso = (nrRegistroAtual.doubleValue()/nrRegistroTotal.doubleValue());
-                                            this.pcProgresso = Math.round((vlProgresso) * 100);
-                                            
-                                            try {
-                                                entityManager.getTransaction().begin();
-                                                
-                                                importDataGeoInfoXMLNFE.importar(zipFile.getInputStream(ze), true);
-                                                
-                                                if((nrArquivo % 50) == 0){
-                                                    try{
-                                                        entityManager.getTransaction().commit();
-                                                        entityManager.getTransaction().begin();
-                                                    }catch(Exception ex){
-                                                        inErroCommit = true;
-                                                        entityManager.getTransaction().rollback();
-                                                        
-                                                        this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, "Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage()));
-                                                        
-                                                        FacesMessage fm = new FacesMessage("Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage());
-                                                        fm.setSeverity(FacesMessage.SEVERITY_INFO);
-                                                        fc.addMessage(null, fm);
-                                                    }
-                                                    
-                                                }
-
-                                            } catch (IOException ex) {
-                                                FacesMessage fm = new FacesMessage("Erro na importação de arquivo! " + ex.getMessage());
-                                                fm.setSeverity(FacesMessage.SEVERITY_ERROR);
-                                                fc.addMessage(null, fm);
-                                            } catch (JDOMException ex) {
-                                                FacesMessage fm = new FacesMessage("Erro na importação de arquivo! " + ex.getMessage());
-                                                fm.setSeverity(FacesMessage.SEVERITY_ERROR);
-                                                fc.addMessage(null, fm);
-                                            }
-                                        }
-                                        
-                                        if(!inErroCommit){
-                                            try{
-                                                entityManager.getTransaction().commit();
-                                                
-                                                if(this.inFechouImportacao){
-                                                    this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, "Importação de dados finalizada pelo usuário!"));
-                                                    
-                                                    FacesMessage fm = new FacesMessage("Importação de dados finalizada pelo usuário!");
-                                                    fm.setSeverity(FacesMessage.SEVERITY_WARN);
-                                                    fc.addMessage(null, fm);
-                                                }
-                                            }catch(Exception ex){
-                                                inErroCommit = true;
-                                                entityManager.getTransaction().rollback();
-                                                
-                                                this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, "Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage()));
-                                                
-                                                FacesMessage fm = new FacesMessage("Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage());
-                                                fm.setSeverity(FacesMessage.SEVERITY_ERROR);
-                                                fc.addMessage(null, fm);
-                                            }
-                                        }
-                                    }
-                                }
-                                
-                                if((!inErroCommit)&&(!this.inFechouImportacao)){
-                                    this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Importação de dados finalizada com sucesso!"));
-
-                                    FacesMessage fm = new FacesMessage("Importação de dados finalizada com sucesso!");
-                                    fm.setSeverity(FacesMessage.SEVERITY_INFO);
-                                    fc.addMessage(null, fm);
-                                    
-                                    this.dsMensagem = "Importação finalizada com sucesso!";
                                 }else{
-                                    this.dsMensagem = "Importação finalizada!";
-                                }
-                                
-                                this.pcProgresso = new Long(100);
-                            }else{
-                                this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "O usuário logado não é um usuário master! Somente usuários do tipo master (Administrador ou Estabelecimento) podem importar arquivos!"));
+                                    this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, "Não existem arquivos a serem importados em: " + dsFileName));
 
-                                FacesMessage fm = new FacesMessage("O usuário logado não é um usuário master! Somente usuários do tipo master (Administrador ou Estabelecimento) podem importar arquivos!");
+                                    FacesMessage fm = new FacesMessage("Não existem arquivos a serem importados em: " + dsFileName);
+                                    fm.setSeverity(FacesMessage.SEVERITY_WARN);
+                                    fc.addMessage(null, fm);
+                                }
+                            }else{
+                                this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, "Não foi possível criar o arquivo: " + file.getName()));
+
+                                FacesMessage fm = new FacesMessage("Não foi possível criar o arquivo: " + file.getName());
                                 fm.setSeverity(FacesMessage.SEVERITY_ERROR);
                                 fc.addMessage(null, fm);
                             }
                         }else{
-                            this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, "Não existem arquivos a serem importados em: " + dsFileName));
+                            this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, "Não foi possível criar o diretório: " + file.getParentFile().getName()));
 
-                            FacesMessage fm = new FacesMessage("Não existem arquivos a serem importados em: " + dsFileName);
-                            fm.setSeverity(FacesMessage.SEVERITY_WARN);
+                            FacesMessage fm = new FacesMessage("Não foi possível criar o diretório: " + file.getParentFile().getName());
+                            fm.setSeverity(FacesMessage.SEVERITY_ERROR);
                             fc.addMessage(null, fm);
                         }
                     } catch (IOException ex) {
