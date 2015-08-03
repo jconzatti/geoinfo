@@ -389,23 +389,13 @@ public class ImportDataGeoInfoXMLNFE extends ImportDataGeoInfo{
                                                 
                                                 if(!inErro){
                                                     LocalizacaoRepository localizacaoRepository = new LocalizacaoRepository(this.getEntityManager());
-                                                    List<Localizacao> listaLocalizacao = localizacaoRepository.getListLocalizacao(estabelecimento.getCdPessoa(), localizacaoE.getLocalizacaoPK().getCidade().getCidadePK());
-                                                    if(listaLocalizacao.size() > 0){
-                                                        Localizacao le = null;
-                                                        int j = 0;
-                                                        while((j < listaLocalizacao.size())&&(le==null)){
-                                                            le = listaLocalizacao.get(j);
-                                                            if((!localizacaoE.getDsBairro().equals(le.getDsBairro()))
-                                                                    ||(!localizacaoE.getDsEndereco().equals(le.getDsEndereco()))
-                                                                    ||(!localizacaoE.getDsNumero().equals(le.getDsNumero())))
-                                                                le = null;
-                                                            j++;
-                                                        }
-                                                        if(le==null){
-                                                            localizacaoE.getLocalizacaoPK().setDtLocalizacao(venda.getDtVenda());
-                                                            localizacaoRepository.insert(localizacaoE);
-                                                        }
-                                                    }else{
+                                                    Localizacao le = localizacaoRepository.getLocalizacaoRecente(estabelecimento.getCdPessoa());
+                                                    if((!localizacaoE.getDsBairro().equals(le.getDsBairro()))
+                                                            ||(!localizacaoE.getDsEndereco().equals(le.getDsEndereco()))
+                                                            ||(!localizacaoE.getDsNumero().equals(le.getDsNumero()))){
+                                                        le = null;
+                                                    }
+                                                    if(le==null){
                                                         localizacaoE.getLocalizacaoPK().setDtLocalizacao(venda.getDtVenda());
                                                         localizacaoRepository.insert(localizacaoE);
                                                     }
@@ -488,7 +478,7 @@ public class ImportDataGeoInfoXMLNFE extends ImportDataGeoInfo{
                                                                 }
 
                                                                 if(!inErro){
-                                                                    if(localizacaoE.getLocalizacaoPK().getCidade() == null){
+                                                                    if(localizacaoC.getLocalizacaoPK().getCidade() == null){
                                                                         inErro = true;
                                                                         if(this.getListaGeoInfoLogNode() != null){
                                                                             this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, 
@@ -500,23 +490,13 @@ public class ImportDataGeoInfoXMLNFE extends ImportDataGeoInfo{
                                                 
                                                                 if(!inErro){
                                                                     LocalizacaoRepository localizacaoRepository = new LocalizacaoRepository(this.getEntityManager());
-                                                                    List<Localizacao> listaLocalizacao = localizacaoRepository.getListLocalizacao(cliente.getCdPessoa(), localizacaoC.getLocalizacaoPK().getCidade().getCidadePK());
-                                                                    if(listaLocalizacao.size() > 0){
-                                                                        Localizacao lc = null;
-                                                                        int j = 0;
-                                                                        while((j < listaLocalizacao.size())&&(lc==null)){
-                                                                            lc = listaLocalizacao.get(j);
-                                                                            if((!localizacaoC.getDsBairro().equals(lc.getDsBairro()))
-                                                                                    ||(!localizacaoC.getDsEndereco().equals(lc.getDsEndereco()))
-                                                                                    ||(!localizacaoC.getDsNumero().equals(lc.getDsNumero())))
-                                                                                lc = null;
-                                                                            j++;
-                                                                        }
-                                                                        if(lc==null){
-                                                                            localizacaoC.getLocalizacaoPK().setDtLocalizacao(venda.getDtVenda());
-                                                                            localizacaoRepository.insert(localizacaoC);
-                                                                        }
-                                                                    }else{
+                                                                    Localizacao lc = localizacaoRepository.getLocalizacaoRecente(cliente.getCdPessoa());
+                                                                    if((!localizacaoC.getDsBairro().equals(lc.getDsBairro()))
+                                                                            ||(!localizacaoC.getDsEndereco().equals(lc.getDsEndereco()))
+                                                                            ||(!localizacaoC.getDsNumero().equals(lc.getDsNumero()))){
+                                                                        lc = null;
+                                                                    }
+                                                                    if(lc==null){
                                                                         localizacaoC.getLocalizacaoPK().setDtLocalizacao(venda.getDtVenda());
                                                                         localizacaoRepository.insert(localizacaoC);
                                                                     }
