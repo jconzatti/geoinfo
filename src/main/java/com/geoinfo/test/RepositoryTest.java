@@ -1,5 +1,6 @@
 package com.geoinfo.test;
 
+import com.geoinfo.entity.Administrador;
 import com.geoinfo.entity.Cidade;
 import com.geoinfo.entity.Fato;
 import com.geoinfo.exception.ObjetoFatoBuilderException;
@@ -10,6 +11,7 @@ import com.geoinfo.model.ObjetoFato;
 import com.geoinfo.model.ObjetoFatoPeriodo;
 import com.geoinfo.model.PeriodoIntervalo;
 import com.geoinfo.model.PeriodoIntervaloComparavel;
+import com.geoinfo.repository.AdministradorRepository;
 import com.geoinfo.repository.FatoRepository;
 import com.geoinfo.util.EPeriodoMesType;
 import com.geoinfo.util.EPeriodoType;
@@ -37,10 +39,13 @@ public class RepositoryTest {
         List<Fato> listaFato = new ArrayList<Fato>();
         listaFato.add(fato);
         
+        AdministradorRepository administradorRepository = new AdministradorRepository(entityManager);
+        Administrador administrador = administradorRepository.find((long)1);
+        
         try{
             PeriodoIntervaloComparavel periodoIntervaloComparavel = PeriodoIntervaloComparavel.create(PeriodoIntervalo.create(EPeriodoType.DATA, 2010, EPeriodoMesType.JAN, 27, 0, null, 0, false), null, false);
 
-            ListaObjetoFato<Cidade> objetoFatoBuilderCidade = ListaObjetoFato.create(listaFato, periodoIntervaloComparavel, entityManager, Cidade.class);
+            ListaObjetoFato<Cidade> objetoFatoBuilderCidade = ListaObjetoFato.create(listaFato, periodoIntervaloComparavel, entityManager, Cidade.class, administrador);
 
             Iterator<ObjetoFato<Cidade>> itObjetoFato = objetoFatoBuilderCidade.getLista().iterator();
             while (itObjetoFato.hasNext()){

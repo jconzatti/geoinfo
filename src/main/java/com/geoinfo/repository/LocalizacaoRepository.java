@@ -22,4 +22,18 @@ public class LocalizacaoRepository extends Repository<Localizacao, LocalizacaoPK
         return query.getResultList();
     }
     
+    public Localizacao getLocalizacaoRecente(Long cdPessoa){
+        Query query = this.manager.createQuery("select l from Localizacao l "
+                + "where l.localizacaoPK.pessoa.cdPessoa = :cdPessoa "
+                + "and l.localizacaoPK.dtLocalizacao = "
+                + "(select max(l1.localizacaoPK.dtLocalizacao) from Localizacao l1 "
+                + " where l1.localizacaoPK.pessoa.cdPessoa = :cdPessoa)")
+                .setParameter("cdPessoa", cdPessoa);
+        List<Localizacao> listaLocalizacao = query.getResultList();
+        if(listaLocalizacao.isEmpty())
+            return null;
+        else
+            return listaLocalizacao.get(listaLocalizacao.size()-1);
+    }
+    
 }
