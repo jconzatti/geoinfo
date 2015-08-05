@@ -292,7 +292,10 @@ public abstract class ImportDataGeoInfoCSVPessoa extends ImportDataGeoInfoCSV{
                             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                             Date dtLocalizacao = null;
                             try {
-                                dtLocalizacao = sdf.parse(listaPessoa[4]);
+                                String strDtLocalizacao = listaPessoa[4];
+                                if(strDtLocalizacao.isEmpty())
+                                    strDtLocalizacao = "30/12/1899";
+                                dtLocalizacao = sdf.parse(strDtLocalizacao);
                             } catch (ParseException ex) { }
 
                             if(dtLocalizacao != null){
