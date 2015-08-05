@@ -4,15 +4,14 @@ import com.geoinfo.model.RegiaoGeograficaPontual;
 import com.geoinfo.util.IRepositorable;
 import java.io.Serializable;
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 
 @Entity
 public class LocalizacaoDestinoVenda extends RegiaoGeograficaPontual implements Serializable, IRepositorable {
-    @Id @OneToOne
-    private Venda venda;
+    @EmbeddedId
+    private LocalizacaoDestinoVendaPK localizacaoDestinoVendaPK;
     @ManyToOne
     private Cidade cidade;
     private String dsBairro;
@@ -20,12 +19,12 @@ public class LocalizacaoDestinoVenda extends RegiaoGeograficaPontual implements 
     @Column(length=30)
     private String dsNumero;
 
-    public Venda getVenda() {
-        return venda;
+    public LocalizacaoDestinoVendaPK getLocalizacaoDestinoVendaPK() {
+        return localizacaoDestinoVendaPK;
     }
 
-    public void setVenda(Venda venda) {
-        this.venda = venda;
+    public void setLocalizacaoDestinoVendaPK(LocalizacaoDestinoVendaPK localizacaoDestinoVendaPK) {
+        this.localizacaoDestinoVendaPK = localizacaoDestinoVendaPK;
     }
 
     public Cidade getCidade() {
@@ -67,7 +66,7 @@ public class LocalizacaoDestinoVenda extends RegiaoGeograficaPontual implements 
 
     @Override
     public String getDsCodigo() {
-        return this.venda.getDsCodigo();
+        return this.getLocalizacaoDestinoVendaPK().getVenda().getDsCodigo();
     }
     
     
