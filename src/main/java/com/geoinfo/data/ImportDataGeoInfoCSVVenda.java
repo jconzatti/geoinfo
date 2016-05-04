@@ -425,7 +425,7 @@ public class ImportDataGeoInfoCSVVenda extends ImportDataGeoInfoCSV{
 
                                             Double vlProduto = null;
                                             try{
-                                                vlProduto = Double.valueOf(listaVenda[3].replace(",", "."));
+                                                vlProduto = Double.valueOf(listaVenda[4].replace(",", "."));
                                             }catch(NumberFormatException nfe){ 
                                                 if(this.getListaGeoInfoLogNode() != null){
                                                     this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, 
