@@ -12,6 +12,8 @@ import com.geoinfo.entity.ItemVenda;
 import com.geoinfo.entity.ItemVendaPK;
 import com.geoinfo.entity.LocalizacaoDestinoVenda;
 import com.geoinfo.entity.LocalizacaoDestinoVendaPK;
+import com.geoinfo.entity.LocalizacaoOrigemVenda;
+import com.geoinfo.entity.LocalizacaoOrigemVendaPK;
 import com.geoinfo.entity.Pais;
 import com.geoinfo.entity.PessoaMaster;
 import com.geoinfo.entity.Produto;
@@ -35,6 +37,7 @@ import com.geoinfo.model.GeoInfoLogNode;
 import com.geoinfo.repository.CidadeRepository;
 import com.geoinfo.repository.EstadoRepository;
 import com.geoinfo.repository.LocalizacaoDestinoVendaRepository;
+import com.geoinfo.repository.LocalizacaoOrigemVendaRepository;
 import com.geoinfo.repository.PaisRepository;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -732,24 +735,265 @@ public class ImportDataGeoInfoCSVVenda extends ImportDataGeoInfoCSV{
                                 }
                             }
                         }else{
-                            if(listaVenda[0].equalsIgnoreCase("C") || listaVenda[0].equalsIgnoreCase("LC")){
-                                return this.importDataGeoInfoCliente.importar(nrLinha, dsLinha);
-                            }else{
-                                if(listaVenda[0].equalsIgnoreCase("D") || listaVenda[0].equalsIgnoreCase("LD")){
-                                    return this.importDataGeoInfoVendedor.importar(nrLinha, dsLinha);
-                                }else{
-                                    if(listaVenda[0].equalsIgnoreCase("E") || listaVenda[0].equalsIgnoreCase("LE")){
-                                        return this.importDataGeoInfoEstabelecimento.importar(nrLinha, dsLinha);
-                                    }else{
-                                        if(listaVenda[0].equalsIgnoreCase("G")){
-                                            return this.importDataGeoInfoFormaPagamento.importar(nrLinha, dsLinha);
-                                        }else{
-                                            if(listaVenda[0].equalsIgnoreCase("P")){
-                                                return this.importDataGeoInfoProduto.importar(nrLinha, dsLinha);
+                            if(listaVenda[0].equalsIgnoreCase("OV")){
+                                if(this.getListaGeoInfoLogNode() != null){
+                                    this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Importando Linha (" + nrLinha + "): " + dsLinha, nrLinha));
+                                }
+
+                                if(venda != null){
+                                    if(listaVenda.length == 10){
+                                        Pais pais = null;
+                                        Estado estado = null;
+                                        Cidade cidade = null;
+
+                                        if((listaVenda[4] != null)&&(!listaVenda[4].equalsIgnoreCase(""))){
+                                            PaisRepository paisRepository = new PaisRepository(this.getEntityManager());
+                                            int idPais = 2;
+                                            try{
+                                                idPais = Integer.parseInt(listaVenda[1]);
+                                            }catch(NumberFormatException nfe){ 
+                                                if(this.getListaGeoInfoLogNode() != null){
+                                                    this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, 
+                                                            "Linha (" + nrLinha + "): Problema no tipo de localização de país ("+listaVenda[1]+")! " + nfe.getMessage(), nrLinha));
+                                                }
+                                            }
+
+                                            switch(idPais){
+                                                case 0:
+                                                    Long cdBACENPais = (long) 0;
+                                                    try{
+                                                        cdBACENPais = Long.valueOf(listaVenda[4]);
+                                                    }catch(NumberFormatException nfe){ 
+                                                        if(this.getListaGeoInfoLogNode() != null){
+                                                            this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, 
+                                                                    "Linha (" + nrLinha + "): Código BACEN de país (campo 6 com valor "+listaVenda[5]+") inválido! " + nfe.getMessage(), nrLinha));
+                                                        }
+                                                    }
+
+                                                    if(cdBACENPais > 0){
+
+                                                        pais = paisRepository.findBACEN(cdBACENPais);
+                                                    }
+                                                    break;
+                                                case 1:
+                                                    String cdGMIPais = listaVenda[4];
+                                                    pais = paisRepository.findGMI(cdGMIPais);
+                                                    break;
+                                                case 2:
+                                                    String dsPais = listaVenda[4];
+                                                    pais = paisRepository.find(dsPais);
+                                                    break;
+                                                default:
+                                                    if(this.getListaGeoInfoLogNode() != null){
+                                                        this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, 
+                                                                "Linha (" + nrLinha + "): Valor (" + String.valueOf(idPais) + ") inválido para o tipo de localização de país!", nrLinha));
+                                                    }
+                                                    break;
+                                            }
+                                            if(pais != null){
+                                                if(this.getListaGeoInfoLogNode() != null){
+                                                    this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, 
+                                                            "Linha (" + nrLinha + "): País localizado: " + pais.getDsPais(), nrLinha));
+                                                }
                                             }else{
                                                 if(this.getListaGeoInfoLogNode() != null){
-                                                    this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, 
-                                                            "Linha (" + nrLinha + "): Tipo de registro (campo 1) inválido para o arquivo de Venda!", nrLinha));
+                                                    this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, 
+                                                            "Linha (" + nrLinha + "): País não localizado! " + venda.toString(), nrLinha));
+                                                }
+                                            }
+                                        }
+
+                                        if((listaVenda[5] != null)&&(!listaVenda[5].equalsIgnoreCase(""))){
+                                            EstadoRepository estadoRepository = new EstadoRepository(this.getEntityManager());
+                                            int idEstado = 2;
+                                            try{
+                                                idEstado = Integer.parseInt(listaVenda[2]);
+                                            }catch(NumberFormatException nfe){ 
+                                                if(this.getListaGeoInfoLogNode() != null){
+                                                    this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, 
+                                                            "Linha (" + nrLinha + "): Problema no tipo de localização de estado ("+listaVenda[2]+")! " + nfe.getMessage(), nrLinha));
+                                                }
+                                            }
+
+                                            switch(idEstado){
+                                                case 0:
+                                                    Long cdIBGEEstado = (long) 0;
+                                                    try{
+                                                        cdIBGEEstado = Long.valueOf(listaVenda[5]);
+                                                    }catch(NumberFormatException nfe){ 
+                                                        if(this.getListaGeoInfoLogNode() != null){
+                                                            this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, 
+                                                                    "Linha (" + nrLinha + "): Código IBGE de estado (campo 7 com valor "+listaVenda[5]+") inválido! " + nfe.getMessage(), nrLinha));
+                                                        }
+                                                    }
+
+                                                    if(cdIBGEEstado > 0){
+                                                        estado = estadoRepository.findIBGE(cdIBGEEstado);
+                                                    }
+                                                    break;
+                                                case 1:
+                                                    if(pais != null){
+                                                        String cdUFEstado = listaVenda[5];
+                                                        estado = estadoRepository.findUF(pais, cdUFEstado);
+                                                    }else{
+                                                        if(this.getListaGeoInfoLogNode() != null){
+                                                            this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, 
+                                                                    "Linha (" + nrLinha + "): Impossível localizar estado pela UF sem ter localizado país!", nrLinha));
+                                                        }
+                                                    }
+                                                    break;
+                                                case 2:
+                                                    if(pais != null){
+                                                        String dsEstado = listaVenda[5];
+                                                        estado = estadoRepository.find(pais, dsEstado);
+                                                    }else{
+                                                        if(this.getListaGeoInfoLogNode() != null){
+                                                            this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, 
+                                                                    "Linha (" + nrLinha + "): Impossível localizar estado pela descrição sem ter localizado país!", nrLinha));
+                                                        }
+                                                    }
+                                                    break;
+                                                default:
+                                                    if(this.getListaGeoInfoLogNode() != null){
+                                                        this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, 
+                                                                "Linha (" + nrLinha + "): Valor (" + String.valueOf(idEstado) + ") inválido para o tipo de localização de estado!", nrLinha));
+                                                    }
+                                                    break;
+                                            }
+                                            if(estado != null){
+                                                if(this.getListaGeoInfoLogNode() != null){
+                                                    this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, 
+                                                            "Linha (" + nrLinha + "): Estado localizado: " + estado.getDsEstado()));
+                                                }
+                                            }else{
+                                                if(this.getListaGeoInfoLogNode() != null){
+                                                    this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, 
+                                                            "Linha (" + nrLinha + "): Estado não localizado! " + venda.toString(), nrLinha));
+                                                }
+                                            }
+                                        }
+
+                                        if((listaVenda[6] != null)&&(!listaVenda[6].equalsIgnoreCase(""))){
+                                            CidadeRepository cidadeRepository = new CidadeRepository(this.getEntityManager());
+                                            int idCidade = 1;
+                                            try{
+                                                idCidade = Integer.parseInt(listaVenda[3]);
+                                            }catch(NumberFormatException nfe){ 
+                                                if(this.getListaGeoInfoLogNode() != null){
+                                                    this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, 
+                                                            "Linha (" + nrLinha + "): Problema no tipo de localização de cidade ("+listaVenda[3]+")! " + nfe.getMessage(), nrLinha));
+                                                }
+                                            }
+
+                                            switch(idCidade){
+                                                case 0:
+                                                    Long cdIBGECidade = (long) 0;
+                                                    try{
+                                                        cdIBGECidade = Long.valueOf(listaVenda[6]);
+                                                    }catch(NumberFormatException nfe){
+                                                        if(this.getListaGeoInfoLogNode() != null){
+                                                            this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, 
+                                                                    "Linha (" + nrLinha + "): Código IBGE de cidade (campo 8 com valor "+listaVenda[6]+") inválido! " + nfe.getMessage(), nrLinha));
+                                                        }
+                                                    }
+
+                                                    if(cdIBGECidade > 0){
+                                                        cidade = cidadeRepository.findIBGE(cdIBGECidade);
+                                                    }
+                                                    break;
+                                                case 1:
+                                                    if(estado != null){
+                                                        String dsCidade = listaVenda[6];
+                                                        cidade = cidadeRepository.find(estado, dsCidade);
+                                                    }else{
+                                                        if(this.getListaGeoInfoLogNode() != null){
+                                                            this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, 
+                                                                    "Linha (" + nrLinha + "): Impossível localizar cidade pela descrição sem ter localizado estado!", nrLinha));
+                                                        }
+                                                    }
+                                                    break;
+                                                default:
+                                                    if(this.getListaGeoInfoLogNode() != null){
+                                                        this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, 
+                                                                "Linha (" + nrLinha + "): Valor (" + String.valueOf(idCidade) + ") inválido para o tipo de localização de cidade!", nrLinha));
+                                                    }
+                                                    break;
+                                            }
+                                            if(cidade != null){
+                                                if(this.getListaGeoInfoLogNode() != null){
+                                                    this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, 
+                                                            "Linha (" + nrLinha + "): Cidade localizada: " + cidade.getDsCidade()));
+                                                }
+                                            }else{
+                                                if(this.getListaGeoInfoLogNode() != null){
+                                                    this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, 
+                                                            "Linha (" + nrLinha + "): Cidade não localizada! " + venda.toString(), nrLinha));
+                                                }
+                                            }
+                                        }
+
+                                        if(cidade != null){
+                                            boolean inInsert = false;
+                                            LocalizacaoOrigemVendaRepository localizacaoOrigemVendaRepository = new LocalizacaoOrigemVendaRepository(this.getEntityManager());
+                                            LocalizacaoOrigemVendaPK localizacaoOrigemVendaPK = new LocalizacaoOrigemVendaPK();
+                                            localizacaoOrigemVendaPK.setVenda(venda);
+
+                                            LocalizacaoOrigemVenda localizacaoOrigemVenda = localizacaoOrigemVendaRepository.find(localizacaoOrigemVendaPK);
+                                            if(localizacaoOrigemVenda == null){
+                                                localizacaoOrigemVenda = new LocalizacaoOrigemVenda();
+                                                localizacaoOrigemVenda.setLocalizacaoOrigemVendaPK(localizacaoOrigemVendaPK);
+                                                inInsert = true;
+                                            }
+
+                                            localizacaoOrigemVenda.setCidade(cidade);
+                                            localizacaoOrigemVenda.setDsBairro(listaVenda[7]);
+                                            localizacaoOrigemVenda.setDsEndereco(listaVenda[8]);
+                                            localizacaoOrigemVenda.setDsNumero(listaVenda[9]);
+
+                                            if(inInsert)
+                                                localizacaoOrigemVendaRepository.insert(localizacaoOrigemVenda);
+                                            else
+                                                localizacaoOrigemVendaRepository.edit(localizacaoOrigemVenda);
+                                            return true;
+
+                                        }else{
+                                            if(this.getListaGeoInfoLogNode() != null){
+                                                this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, 
+                                                        "Linha (" + nrLinha + "): Cidade (" + listaVenda[6] + ") de " + venda.toString() + " não encontada!", nrLinha));
+                                            }
+                                        }
+                                    }else{
+                                        if(this.getListaGeoInfoLogNode() != null){
+                                            this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, 
+                                                    "Linha (" + nrLinha + "): Número de campos no registro de localização de destino da venda (DV) diferente do esperado!", nrLinha));
+                                        }
+                                    }
+                                }else{
+                                    if(this.getListaGeoInfoLogNode() != null){
+                                        this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, 
+                                                "Falta o registro de Venda para o registro de Localização de Destino da Venda!", nrLinha));
+                                    }
+                                }
+                            }else{
+                                if(listaVenda[0].equalsIgnoreCase("C") || listaVenda[0].equalsIgnoreCase("LC")){
+                                    return this.importDataGeoInfoCliente.importar(nrLinha, dsLinha);
+                                }else{
+                                    if(listaVenda[0].equalsIgnoreCase("D") || listaVenda[0].equalsIgnoreCase("LD")){
+                                        return this.importDataGeoInfoVendedor.importar(nrLinha, dsLinha);
+                                    }else{
+                                        if(listaVenda[0].equalsIgnoreCase("E") || listaVenda[0].equalsIgnoreCase("LE")){
+                                            return this.importDataGeoInfoEstabelecimento.importar(nrLinha, dsLinha);
+                                        }else{
+                                            if(listaVenda[0].equalsIgnoreCase("G")){
+                                                return this.importDataGeoInfoFormaPagamento.importar(nrLinha, dsLinha);
+                                            }else{
+                                                if(listaVenda[0].equalsIgnoreCase("P")){
+                                                    return this.importDataGeoInfoProduto.importar(nrLinha, dsLinha);
+                                                }else{
+                                                    if(this.getListaGeoInfoLogNode() != null){
+                                                        this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, 
+                                                                "Linha (" + nrLinha + "): Tipo de registro (campo 1) inválido para o arquivo de Venda!", nrLinha));
+                                                    }
                                                 }
                                             }
                                         }
