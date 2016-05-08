@@ -410,9 +410,10 @@ public class ImportDataGeoInfoXMLNFE extends ImportDataGeoInfo{
                                                 Localizacao localizacaoC = null;
                                                 if(!inErro){
                                                     eNFe = getChildElement(eInfNFe, "dest");
-                                                    Cliente cliente = new Cliente();
-                                                    cliente.setGerente(this.getGerente());
                                                     if(eNFe != null){
+                                                        Cliente cliente = new Cliente();
+                                                        cliente.setGerente(this.getGerente());
+                                                        
                                                         i = eNFe.getChildren().iterator();
                                                         while(i.hasNext()){
                                                             Element e = (Element) i.next();
