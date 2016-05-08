@@ -407,6 +407,7 @@ public class ImportDataGeoInfoXMLNFE extends ImportDataGeoInfo{
                                                     }
                                                 }
 
+                                                Localizacao localizacaoC = null;
                                                 if(!inErro){
                                                     eNFe = getChildElement(eInfNFe, "dest");
                                                     Cliente cliente = new Cliente();
@@ -461,7 +462,7 @@ public class ImportDataGeoInfoXMLNFE extends ImportDataGeoInfo{
                                                             }
 
                                                             LocalizacaoPK localizacaoCPK = new LocalizacaoPK();
-                                                            Localizacao localizacaoC = new Localizacao();
+                                                            localizacaoC = new Localizacao();
                                                             localizacaoC.setLocalizacaoPK(localizacaoCPK);
                                                             localizacaoC.getLocalizacaoPK().setPessoa(cliente);
                                                             venda.setCliente(cliente);
@@ -507,259 +508,266 @@ public class ImportDataGeoInfoXMLNFE extends ImportDataGeoInfo{
                                                                         localizacaoRepository.insert(localizacaoC);
                                                                     }
                                                                 }
+                                                            }
+                                                        }
+                                                    }
                                                                 
-                                                                if(!inErro){
-                                                                    VendaRepository vendaRepository = new VendaRepository(this.getEntityManager());
-                                                                    Venda v = vendaRepository.find(venda.getVendaPK());
-                                                                    if(v==null){
-                                                                        venda.setIdStatus((short)0);
-                                                                        vendaRepository.insert(venda);
-                                                                    }else{
-                                                                        venda.setIdStatus(v.getIdStatus());
-                                                                    }
-                                                                    
-                                                                    eNFe = getChildElement(eInfNFe, "retirada");
-                                                                    
-                                                                    LocalizacaoOrigemVendaPK localizacaoOrigemVendaPK = new LocalizacaoOrigemVendaPK();
-                                                                    localizacaoOrigemVendaPK.setVenda(venda);
-                                                                    
-                                                                    LocalizacaoOrigemVendaRepository localizacaoOrigemVendaRepository = new LocalizacaoOrigemVendaRepository(this.getEntityManager());
-                                                                    if (localizacaoOrigemVendaRepository.find(localizacaoOrigemVendaPK) != null)
-                                                                        localizacaoOrigemVendaRepository.delete(localizacaoOrigemVendaPK);
-                                                                    
-                                                                    LocalizacaoOrigemVenda localizacaoOrigemVenda = new LocalizacaoOrigemVenda();
-                                                                    localizacaoOrigemVenda.setLocalizacaoOrigemVendaPK(localizacaoOrigemVendaPK);
-                                                                    
-                                                                    if(eNFe == null){
-                                                                        localizacaoOrigemVenda.setCidade(localizacaoE.getLocalizacaoPK().getCidade());
-                                                                        localizacaoOrigemVenda.setDsBairro(localizacaoE.getDsBairro());
-                                                                        localizacaoOrigemVenda.setDsEndereco(localizacaoE.getDsEndereco());
-                                                                        localizacaoOrigemVenda.setDsNumero(localizacaoE.getDsNumero());
-                                                                    }else{
-                                                                        i = eNFe.getChildren().iterator();
-                                                                        while(i.hasNext()){
-                                                                            Element e = (Element) i.next();
-                                                                            String dsNome = e.getName();
-                                                                            if(dsNome.equals("xLgr")){
-                                                                                localizacaoOrigemVenda.setDsEndereco(e.getText());
-                                                                            }else if(dsNome.equals("nro")){
-                                                                                localizacaoOrigemVenda.setDsNumero(e.getText());
-                                                                            }else if(dsNome.equals("xBairro")){
-                                                                                localizacaoOrigemVenda.setDsBairro(e.getText());
-                                                                            }else if(dsNome.equals("cMun")){
-                                                                                CidadeRepository cidadeRepository = new CidadeRepository(this.getEntityManager());
-                                                                                localizacaoOrigemVenda.setCidade(cidadeRepository.findIBGE(Long.parseLong(e.getText())));
-                                                                            }
-                                                                        }
+                                                    if(!inErro){
+                                                        VendaRepository vendaRepository = new VendaRepository(this.getEntityManager());
+                                                        Venda v = vendaRepository.find(venda.getVendaPK());
+                                                        if(v==null){
+                                                            venda.setIdStatus((short)0);
+                                                            vendaRepository.insert(venda);
+                                                        }else{
+                                                            venda.setIdStatus(v.getIdStatus());
+                                                        }
 
-                                                                        if(!inErro){
-                                                                            if(localizacaoOrigemVenda.getCidade() == null){
-                                                                                inErro = true;
-                                                                                if(this.getListaGeoInfoLogNode() != null){
-                                                                                    this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, 
-                                                                                            "Não foi possível capturar a cidade (Código IBGE) do local de retirada da NFe modelo: " +
-                                                                                                    cdModelo + ", série: " + cdSerie + ", número: " + nrNotaFiscal + "!"));
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                    
-                                                                    eNFe = getChildElement(eInfNFe, "entrega");
-                                                                    
-                                                                    LocalizacaoDestinoVendaPK localizacaoDestinoVendaPK = new LocalizacaoDestinoVendaPK();
-                                                                    localizacaoDestinoVendaPK.setVenda(venda);
-                                                                    
-                                                                    LocalizacaoDestinoVendaRepository localizacaoDestinoVendaRepository = new LocalizacaoDestinoVendaRepository(this.getEntityManager());
-                                                                    if (localizacaoDestinoVendaRepository.find(localizacaoDestinoVendaPK) != null)
-                                                                        localizacaoDestinoVendaRepository.delete(localizacaoDestinoVendaPK);
-                                                                    
-                                                                    LocalizacaoDestinoVenda localizacaoDestinoVenda = new LocalizacaoDestinoVenda();
-                                                                    localizacaoDestinoVenda.setLocalizacaoDestinoVendaPK(localizacaoDestinoVendaPK);
-                                                                    
-                                                                    if(eNFe == null){
-                                                                        localizacaoDestinoVenda.setCidade(localizacaoC.getLocalizacaoPK().getCidade());
-                                                                        localizacaoDestinoVenda.setDsBairro(localizacaoC.getDsBairro());
-                                                                        localizacaoDestinoVenda.setDsEndereco(localizacaoC.getDsEndereco());
-                                                                        localizacaoDestinoVenda.setDsNumero(localizacaoC.getDsNumero());
-                                                                    }else{
-                                                                        i = eNFe.getChildren().iterator();
-                                                                        while(i.hasNext()){
-                                                                            Element e = (Element) i.next();
-                                                                            String dsNome = e.getName();
-                                                                            if(dsNome.equals("xLgr")){
-                                                                                localizacaoDestinoVenda.setDsEndereco(e.getText());
-                                                                            }else if(dsNome.equals("nro")){
-                                                                                localizacaoDestinoVenda.setDsNumero(e.getText());
-                                                                            }else if(dsNome.equals("xBairro")){
-                                                                                localizacaoDestinoVenda.setDsBairro(e.getText());
-                                                                            }else if(dsNome.equals("cMun")){
-                                                                                CidadeRepository cidadeRepository = new CidadeRepository(this.getEntityManager());
-                                                                                localizacaoDestinoVenda.setCidade(cidadeRepository.findIBGE(Long.parseLong(e.getText())));
-                                                                            }
-                                                                        }
+                                                        eNFe = getChildElement(eInfNFe, "retirada");
 
-                                                                        if(!inErro){
-                                                                            if(localizacaoDestinoVenda.getCidade() == null){
-                                                                                inErro = true;
-                                                                                if(this.getListaGeoInfoLogNode() != null){
-                                                                                    this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, 
-                                                                                            "Não foi possível capturar a cidade (Código IBGE) do local de entrega da NFe modelo: " +
-                                                                                                    cdModelo + ", série: " + cdSerie + ", número: " + nrNotaFiscal + "!"));
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                    
-                                                                    if(!inErro){
-                                                                        localizacaoOrigemVendaRepository.insert(localizacaoOrigemVenda);
-                                                                        localizacaoDestinoVendaRepository.insert(localizacaoDestinoVenda);
-                                                                        
-                                                                        double vlDesconto = 0;
-                                                                        long nItem = 0;
-                                                                        do{
-                                                                            nItem++;
-                                                                            eNFe = getChildElement(eInfNFe, "det", "nItem", String.valueOf(nItem));
-                                                                            if(eNFe != null){
-                                                                                Element eProdNFe = getChildElement(eNFe, "prod");
-                                                                                if(eProdNFe != null){
-                                                                                    ProdutoPK produtoPK = new ProdutoPK();
-                                                                                    Produto produto = new Produto();
-                                                                                    produto.setProdutoPK(produtoPK);
-                                                                                    produto.getProdutoPK().setGerente(this.getGerente());
+                                                        LocalizacaoOrigemVendaPK localizacaoOrigemVendaPK = new LocalizacaoOrigemVendaPK();
+                                                        localizacaoOrigemVendaPK.setVenda(venda);
 
+                                                        LocalizacaoOrigemVendaRepository localizacaoOrigemVendaRepository = new LocalizacaoOrigemVendaRepository(this.getEntityManager());
+                                                        if (localizacaoOrigemVendaRepository.find(localizacaoOrigemVendaPK) != null)
+                                                            localizacaoOrigemVendaRepository.delete(localizacaoOrigemVendaPK);
 
-                                                                                    ItemVendaPK itemVendaPK = new ItemVendaPK();
-                                                                                    ItemVenda itemVenda = new ItemVenda();
-                                                                                    itemVenda.setItemVendaPK(itemVendaPK);
-                                                                                    itemVenda.getItemVendaPK().setVenda(venda);
-                                                                                    itemVenda.getItemVendaPK().setCdItemVenda(nItem);
+                                                        LocalizacaoOrigemVenda localizacaoOrigemVenda = new LocalizacaoOrigemVenda();
+                                                        localizacaoOrigemVenda.setLocalizacaoOrigemVendaPK(localizacaoOrigemVendaPK);
 
-                                                                                    double vlTotalItem = 0;
-                                                                                    int cdCFOP = 0;
-                                                                                    i = eProdNFe.getChildren().iterator();
-                                                                                    while(i.hasNext()){
-                                                                                        Element e = (Element) i.next();
-                                                                                        String dsNome = e.getName();
-                                                                                        if(dsNome.equals("cProd")){
-                                                                                            produto.getProdutoPK().setCdProduto(e.getText());
-                                                                                        }else if(dsNome.equals("xProd")){
-                                                                                            produto.setDsProduto(e.getText());
-                                                                                        }else if(dsNome.equals("qCom")){
-                                                                                            itemVenda.setQtProduto(Double.parseDouble(e.getText()));
-                                                                                        }else if(dsNome.equals("CFOP")){
-                                                                                            cdCFOP = Integer.parseInt(e.getText());
-                                                                                        }else if(dsNome.equals("vDesc")){
-                                                                                            vlDesconto += Double.parseDouble(e.getText());
-                                                                                        }else if(dsNome.equals("vProd")){
-                                                                                            vlTotalItem += Double.parseDouble(e.getText());
-                                                                                        }else if(dsNome.equals("vFrete")){
-                                                                                            vlTotalItem += Double.parseDouble(e.getText());
-                                                                                        }else if(dsNome.equals("vSeg")){
-                                                                                            vlTotalItem += Double.parseDouble(e.getText());
-                                                                                        }else if(dsNome.equals("vOutro")){
-                                                                                            vlTotalItem += Double.parseDouble(e.getText());
-                                                                                        }
-                                                                                    }
+                                                        if(eNFe == null){
+                                                            localizacaoOrigemVenda.setCidade(localizacaoE.getLocalizacaoPK().getCidade());
+                                                            localizacaoOrigemVenda.setDsBairro(localizacaoE.getDsBairro());
+                                                            localizacaoOrigemVenda.setDsEndereco(localizacaoE.getDsEndereco());
+                                                            localizacaoOrigemVenda.setDsNumero(localizacaoE.getDsNumero());
+                                                        }else{
+                                                            i = eNFe.getChildren().iterator();
+                                                            while(i.hasNext()){
+                                                                Element e = (Element) i.next();
+                                                                String dsNome = e.getName();
+                                                                if(dsNome.equals("xLgr")){
+                                                                    localizacaoOrigemVenda.setDsEndereco(e.getText());
+                                                                }else if(dsNome.equals("nro")){
+                                                                    localizacaoOrigemVenda.setDsNumero(e.getText());
+                                                                }else if(dsNome.equals("xBairro")){
+                                                                    localizacaoOrigemVenda.setDsBairro(e.getText());
+                                                                }else if(dsNome.equals("cMun")){
+                                                                    CidadeRepository cidadeRepository = new CidadeRepository(this.getEntityManager());
+                                                                    localizacaoOrigemVenda.setCidade(cidadeRepository.findIBGE(Long.parseLong(e.getText())));
+                                                                }
+                                                            }
 
-                                                                                    if(listaCFOPConsiderada.contains(cdCFOP)){
-                                                                                        Element eImpNFe = getChildElement(eNFe, "imposto");
-                                                                                        if(eImpNFe != null){
-                                                                                            Element eImp2NFe = getChildElement(eImpNFe, "ICMS");
-                                                                                            if(eImp2NFe != null){
-                                                                                                Element eImp3NFe = getChildElement(eImp2NFe, "ICMS10");
-                                                                                                if(eImp3NFe==null)
-                                                                                                    eImp3NFe = getChildElement(eImp2NFe, "ICMS30");
-                                                                                                if(eImp3NFe==null)
-                                                                                                    eImp3NFe = getChildElement(eImp2NFe, "ICMS70");
-                                                                                                if(eImp3NFe==null)
-                                                                                                    eImp3NFe = getChildElement(eImp2NFe, "ICMS90");
-                                                                                                if(eImp3NFe==null)
-                                                                                                    eImp3NFe = getChildElement(eImp2NFe, "ICMSPart");
-                                                                                                if(eImp3NFe==null)
-                                                                                                    eImp3NFe = getChildElement(eImp2NFe, "ICMSSN201");
-                                                                                                if(eImp3NFe==null)
-                                                                                                    eImp3NFe = getChildElement(eImp2NFe, "ICMSSN202");
-                                                                                                if(eImp3NFe==null)
-                                                                                                    eImp3NFe = getChildElement(eImp2NFe, "ICMSSN900");
-
-                                                                                                if(eImp3NFe!=null){
-                                                                                                    i = eImp3NFe.getChildren().iterator();
-                                                                                                    while(i.hasNext()){
-                                                                                                        Element e = (Element) i.next();
-                                                                                                        String dsNome = e.getName();
-                                                                                                        if(dsNome.equals("vICMSST")){
-                                                                                                            vlTotalItem += Double.parseDouble(e.getText());
-                                                                                                        }
-                                                                                                    }
-                                                                                                }
-                                                                                            }
-
-                                                                                            eImp2NFe = getChildElement(eImpNFe, "IPI");
-                                                                                            if(eImp2NFe != null){
-                                                                                                Element eImp3NFe = getChildElement(eImp2NFe, "IPITrib");
-
-                                                                                                if(eImp3NFe!=null){
-                                                                                                    i = eImp3NFe.getChildren().iterator();
-                                                                                                    while(i.hasNext()){
-                                                                                                        Element e = (Element) i.next();
-                                                                                                        String dsNome = e.getName();
-                                                                                                        if(dsNome.equals("vIPI")){
-                                                                                                            vlTotalItem += Double.parseDouble(e.getText());
-                                                                                                        }
-                                                                                                    }
-                                                                                                }
-                                                                                            }
-
-                                                                                            eImp2NFe = getChildElement(eImpNFe, "II");
-                                                                                            if(eImp2NFe != null){
-                                                                                                i = eImp2NFe.getChildren().iterator();
-                                                                                                while(i.hasNext()){
-                                                                                                    Element e = (Element) i.next();
-                                                                                                    String dsNome = e.getName();
-                                                                                                    if(dsNome.equals("vII")){
-                                                                                                        vlTotalItem += Double.parseDouble(e.getText());
-                                                                                                    }
-                                                                                                }
-                                                                                            }
-                                                                                        }
-
-                                                                                        ProdutoRepository produtoRepository = new ProdutoRepository(this.getEntityManager());
-                                                                                        Produto p = produtoRepository.find(produto.getProdutoPK());
-                                                                                        if(p==null){
-                                                                                            produtoRepository.insert(produto);
-                                                                                        }else{
-                                                                                            if(!produto.getDsProduto().equals(p.getDsProduto())){
-                                                                                                produtoRepository.edit(produto);
-                                                                                            }
-                                                                                        }
-
-                                                                                        double vlUnitarioItem = 0;
-                                                                                        if((vlTotalItem > 0)&&(itemVenda.getQtProduto() > 0)){
-                                                                                            vlUnitarioItem = vlTotalItem/itemVenda.getQtProduto();
-                                                                                        }
-                                                                                        itemVenda.setProduto(produto);
-                                                                                        itemVenda.setVlProduto(vlUnitarioItem);
-
-                                                                                        venda.setVlDesconto(vlDesconto);
-                                                                                        vendaRepository.edit(venda);
-
-                                                                                        ItemVendaRepository itemVendaRepository = new ItemVendaRepository(this.getEntityManager());
-                                                                                        ItemVenda iv = itemVendaRepository.find(itemVenda.getItemVendaPK());
-                                                                                        if(iv==null){
-                                                                                            itemVendaRepository.insert(itemVenda);
-                                                                                        }else{
-                                                                                            itemVendaRepository.edit(itemVenda);
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }while(eNFe != null);
-                                                                        return true;
+                                                            if(!inErro){
+                                                                if(localizacaoOrigemVenda.getCidade() == null){
+                                                                    inErro = true;
+                                                                    if(this.getListaGeoInfoLogNode() != null){
+                                                                        this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, 
+                                                                                "Não foi possível capturar a cidade (Código IBGE) do local de retirada da NFe modelo: " +
+                                                                                        cdModelo + ", série: " + cdSerie + ", número: " + nrNotaFiscal + "!"));
                                                                     }
                                                                 }
                                                             }
                                                         }
-                                                    }
+
+                                                        eNFe = getChildElement(eInfNFe, "entrega");
+
+                                                        LocalizacaoDestinoVendaPK localizacaoDestinoVendaPK = new LocalizacaoDestinoVendaPK();
+                                                        localizacaoDestinoVendaPK.setVenda(venda);
+
+                                                        LocalizacaoDestinoVendaRepository localizacaoDestinoVendaRepository = new LocalizacaoDestinoVendaRepository(this.getEntityManager());
+                                                        if (localizacaoDestinoVendaRepository.find(localizacaoDestinoVendaPK) != null)
+                                                            localizacaoDestinoVendaRepository.delete(localizacaoDestinoVendaPK);
+
+                                                        LocalizacaoDestinoVenda localizacaoDestinoVenda = new LocalizacaoDestinoVenda();
+                                                        localizacaoDestinoVenda.setLocalizacaoDestinoVendaPK(localizacaoDestinoVendaPK);
+
+                                                        if(eNFe == null){
+                                                            if((localizacaoC != null)&&(localizacaoC.getLocalizacaoPK() != null)){
+                                                                localizacaoDestinoVenda.setCidade(localizacaoC.getLocalizacaoPK().getCidade());
+                                                                localizacaoDestinoVenda.setDsBairro(localizacaoC.getDsBairro());
+                                                                localizacaoDestinoVenda.setDsEndereco(localizacaoC.getDsEndereco());
+                                                                localizacaoDestinoVenda.setDsNumero(localizacaoC.getDsNumero());
+                                                            }else{
+                                                                localizacaoDestinoVenda.setCidade(localizacaoE.getLocalizacaoPK().getCidade());
+                                                                localizacaoDestinoVenda.setDsBairro(localizacaoE.getDsBairro());
+                                                                localizacaoDestinoVenda.setDsEndereco(localizacaoE.getDsEndereco());
+                                                                localizacaoDestinoVenda.setDsNumero(localizacaoE.getDsNumero());
+                                                            }
+                                                        }else{
+                                                            i = eNFe.getChildren().iterator();
+                                                            while(i.hasNext()){
+                                                                Element e = (Element) i.next();
+                                                                String dsNome = e.getName();
+                                                                if(dsNome.equals("xLgr")){
+                                                                    localizacaoDestinoVenda.setDsEndereco(e.getText());
+                                                                }else if(dsNome.equals("nro")){
+                                                                    localizacaoDestinoVenda.setDsNumero(e.getText());
+                                                                }else if(dsNome.equals("xBairro")){
+                                                                    localizacaoDestinoVenda.setDsBairro(e.getText());
+                                                                }else if(dsNome.equals("cMun")){
+                                                                    CidadeRepository cidadeRepository = new CidadeRepository(this.getEntityManager());
+                                                                    localizacaoDestinoVenda.setCidade(cidadeRepository.findIBGE(Long.parseLong(e.getText())));
+                                                                }
+                                                            }
+
+                                                            if(!inErro){
+                                                                if(localizacaoDestinoVenda.getCidade() == null){
+                                                                    inErro = true;
+                                                                    if(this.getListaGeoInfoLogNode() != null){
+                                                                        this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, 
+                                                                                "Não foi possível capturar a cidade (Código IBGE) do local de entrega da NFe modelo: " +
+                                                                                        cdModelo + ", série: " + cdSerie + ", número: " + nrNotaFiscal + "!"));
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                                    
+                                                        if(!inErro){
+                                                            localizacaoOrigemVendaRepository.insert(localizacaoOrigemVenda);
+                                                            localizacaoDestinoVendaRepository.insert(localizacaoDestinoVenda);
+
+                                                            double vlDesconto = 0;
+                                                            long nItem = 0;
+                                                            do{
+                                                                nItem++;
+                                                                eNFe = getChildElement(eInfNFe, "det", "nItem", String.valueOf(nItem));
+                                                                if(eNFe != null){
+                                                                    Element eProdNFe = getChildElement(eNFe, "prod");
+                                                                    if(eProdNFe != null){
+                                                                        ProdutoPK produtoPK = new ProdutoPK();
+                                                                        Produto produto = new Produto();
+                                                                        produto.setProdutoPK(produtoPK);
+                                                                        produto.getProdutoPK().setGerente(this.getGerente());
+
+
+                                                                        ItemVendaPK itemVendaPK = new ItemVendaPK();
+                                                                        ItemVenda itemVenda = new ItemVenda();
+                                                                        itemVenda.setItemVendaPK(itemVendaPK);
+                                                                        itemVenda.getItemVendaPK().setVenda(venda);
+                                                                        itemVenda.getItemVendaPK().setCdItemVenda(nItem);
+
+                                                                        double vlTotalItem = 0;
+                                                                        int cdCFOP = 0;
+                                                                        i = eProdNFe.getChildren().iterator();
+                                                                        while(i.hasNext()){
+                                                                            Element e = (Element) i.next();
+                                                                            String dsNome = e.getName();
+                                                                            if(dsNome.equals("cProd")){
+                                                                                produto.getProdutoPK().setCdProduto(e.getText());
+                                                                            }else if(dsNome.equals("xProd")){
+                                                                                produto.setDsProduto(e.getText());
+                                                                            }else if(dsNome.equals("qCom")){
+                                                                                itemVenda.setQtProduto(Double.parseDouble(e.getText()));
+                                                                            }else if(dsNome.equals("CFOP")){
+                                                                                cdCFOP = Integer.parseInt(e.getText());
+                                                                            }else if(dsNome.equals("vDesc")){
+                                                                                vlDesconto += Double.parseDouble(e.getText());
+                                                                            }else if(dsNome.equals("vProd")){
+                                                                                vlTotalItem += Double.parseDouble(e.getText());
+                                                                            }else if(dsNome.equals("vFrete")){
+                                                                                vlTotalItem += Double.parseDouble(e.getText());
+                                                                            }else if(dsNome.equals("vSeg")){
+                                                                                vlTotalItem += Double.parseDouble(e.getText());
+                                                                            }else if(dsNome.equals("vOutro")){
+                                                                                vlTotalItem += Double.parseDouble(e.getText());
+                                                                            }
+                                                                        }
+
+                                                                        if(listaCFOPConsiderada.contains(cdCFOP)){
+                                                                            Element eImpNFe = getChildElement(eNFe, "imposto");
+                                                                            if(eImpNFe != null){
+                                                                                Element eImp2NFe = getChildElement(eImpNFe, "ICMS");
+                                                                                if(eImp2NFe != null){
+                                                                                    Element eImp3NFe = getChildElement(eImp2NFe, "ICMS10");
+                                                                                    if(eImp3NFe==null)
+                                                                                        eImp3NFe = getChildElement(eImp2NFe, "ICMS30");
+                                                                                    if(eImp3NFe==null)
+                                                                                        eImp3NFe = getChildElement(eImp2NFe, "ICMS70");
+                                                                                    if(eImp3NFe==null)
+                                                                                        eImp3NFe = getChildElement(eImp2NFe, "ICMS90");
+                                                                                    if(eImp3NFe==null)
+                                                                                        eImp3NFe = getChildElement(eImp2NFe, "ICMSPart");
+                                                                                    if(eImp3NFe==null)
+                                                                                        eImp3NFe = getChildElement(eImp2NFe, "ICMSSN201");
+                                                                                    if(eImp3NFe==null)
+                                                                                        eImp3NFe = getChildElement(eImp2NFe, "ICMSSN202");
+                                                                                    if(eImp3NFe==null)
+                                                                                        eImp3NFe = getChildElement(eImp2NFe, "ICMSSN900");
+
+                                                                                    if(eImp3NFe!=null){
+                                                                                        i = eImp3NFe.getChildren().iterator();
+                                                                                        while(i.hasNext()){
+                                                                                            Element e = (Element) i.next();
+                                                                                            String dsNome = e.getName();
+                                                                                            if(dsNome.equals("vICMSST")){
+                                                                                                vlTotalItem += Double.parseDouble(e.getText());
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                }
+
+                                                                                eImp2NFe = getChildElement(eImpNFe, "IPI");
+                                                                                if(eImp2NFe != null){
+                                                                                    Element eImp3NFe = getChildElement(eImp2NFe, "IPITrib");
+
+                                                                                    if(eImp3NFe!=null){
+                                                                                        i = eImp3NFe.getChildren().iterator();
+                                                                                        while(i.hasNext()){
+                                                                                            Element e = (Element) i.next();
+                                                                                            String dsNome = e.getName();
+                                                                                            if(dsNome.equals("vIPI")){
+                                                                                                vlTotalItem += Double.parseDouble(e.getText());
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                }
+
+                                                                                eImp2NFe = getChildElement(eImpNFe, "II");
+                                                                                if(eImp2NFe != null){
+                                                                                    i = eImp2NFe.getChildren().iterator();
+                                                                                    while(i.hasNext()){
+                                                                                        Element e = (Element) i.next();
+                                                                                        String dsNome = e.getName();
+                                                                                        if(dsNome.equals("vII")){
+                                                                                            vlTotalItem += Double.parseDouble(e.getText());
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+
+                                                                            ProdutoRepository produtoRepository = new ProdutoRepository(this.getEntityManager());
+                                                                            Produto p = produtoRepository.find(produto.getProdutoPK());
+                                                                            if(p==null){
+                                                                                produtoRepository.insert(produto);
+                                                                            }else{
+                                                                                if(!produto.getDsProduto().equals(p.getDsProduto())){
+                                                                                    produtoRepository.edit(produto);
+                                                                                }
+                                                                            }
+
+                                                                            double vlUnitarioItem = 0;
+                                                                            if((vlTotalItem > 0)&&(itemVenda.getQtProduto() > 0)){
+                                                                                vlUnitarioItem = vlTotalItem/itemVenda.getQtProduto();
+                                                                            }
+                                                                            itemVenda.setProduto(produto);
+                                                                            itemVenda.setVlProduto(vlUnitarioItem);
+
+                                                                            venda.setVlDesconto(vlDesconto);
+                                                                            vendaRepository.edit(venda);
+
+                                                                            ItemVendaRepository itemVendaRepository = new ItemVendaRepository(this.getEntityManager());
+                                                                            ItemVenda iv = itemVendaRepository.find(itemVenda.getItemVendaPK());
+                                                                            if(iv==null){
+                                                                                itemVendaRepository.insert(itemVenda);
+                                                                            }else{
+                                                                                itemVendaRepository.edit(itemVenda);
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }while(eNFe != null);
+                                                            return true;
+                                                        }
+                                                    }                                                           
                                                 }
                                             }
                                         }
