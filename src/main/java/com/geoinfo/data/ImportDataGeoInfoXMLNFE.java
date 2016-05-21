@@ -396,10 +396,12 @@ public class ImportDataGeoInfoXMLNFE extends ImportDataGeoInfo{
                                                 if(!inErro){
                                                     LocalizacaoRepository localizacaoRepository = new LocalizacaoRepository(this.getEntityManager());
                                                     Localizacao le = localizacaoRepository.getLocalizacaoRecente(estabelecimento.getCdPessoa());
-                                                    if((!localizacaoE.getDsBairro().equals(le.getDsBairro()))
-                                                            ||(!localizacaoE.getDsEndereco().equals(le.getDsEndereco()))
-                                                            ||(!localizacaoE.getDsNumero().equals(le.getDsNumero()))){
-                                                        le = null;
+                                                    if(le != null){
+                                                        if((!localizacaoE.getDsBairro().equals(le.getDsBairro()))
+                                                                ||(!localizacaoE.getDsEndereco().equals(le.getDsEndereco()))
+                                                                ||(!localizacaoE.getDsNumero().equals(le.getDsNumero()))){
+                                                            le = null;
+                                                        }
                                                     }
                                                     if(le==null){
                                                         localizacaoE.getLocalizacaoPK().setDtLocalizacao(venda.getDtVenda());
@@ -499,10 +501,12 @@ public class ImportDataGeoInfoXMLNFE extends ImportDataGeoInfo{
                                                                 if(!inErro){
                                                                     LocalizacaoRepository localizacaoRepository = new LocalizacaoRepository(this.getEntityManager());
                                                                     Localizacao lc = localizacaoRepository.getLocalizacaoRecente(cliente.getCdPessoa());
-                                                                    if((!localizacaoC.getDsBairro().equals(lc.getDsBairro()))
-                                                                            ||(!localizacaoC.getDsEndereco().equals(lc.getDsEndereco()))
-                                                                            ||(!localizacaoC.getDsNumero().equals(lc.getDsNumero()))){
-                                                                        lc = null;
+                                                                    if(lc != null){
+                                                                        if((!localizacaoC.getDsBairro().equals(lc.getDsBairro()))
+                                                                                ||(!localizacaoC.getDsEndereco().equals(lc.getDsEndereco()))
+                                                                                ||(!localizacaoC.getDsNumero().equals(lc.getDsNumero()))){
+                                                                            lc = null;
+                                                                        }
                                                                     }
                                                                     if(lc==null){
                                                                         localizacaoC.getLocalizacaoPK().setDtLocalizacao(venda.getDtVenda());
