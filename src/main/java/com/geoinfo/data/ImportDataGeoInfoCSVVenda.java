@@ -1074,7 +1074,7 @@ public class ImportDataGeoInfoCSVVenda extends ImportDataGeoInfoCSV{
             }
         }
         
-        if(inUltima)
+        if(inUltima) 
             setLocalizacaoVenda();
         
         return inImportou;
