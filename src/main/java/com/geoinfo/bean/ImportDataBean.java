@@ -102,6 +102,8 @@ public class ImportDataBean implements Serializable{
                         if (!inDiretorioExiste)
                             inDiretorioExiste = file.getParentFile().mkdirs();
                         if(inDiretorioExiste){
+                            if (file.exists())
+                                file.delete();
                             if (file.createNewFile()){
 
                                 FileOutputStream fos = new FileOutputStream(file);  
@@ -160,9 +162,6 @@ public class ImportDataBean implements Serializable{
                                         if(pessoaGerente == null){
                                             pessoaGerente = (PessoaMaster) pessoaLogada;
                                         }
-                                        
-                                        
-                                        pessoaGerente.isGerente();
 
                                         this.dsMensagem = "Contando registros a serem importadas!";
 
@@ -209,7 +208,8 @@ public class ImportDataBean implements Serializable{
                                                         entityManager.getTransaction().begin();
 
                                                         String dsLinha;
-                                                        Long nrLinha = (long) 0;
+                                                        long nrLinha = 0;
+                                                        long qtLinha = bufferedReader.lines().count();
                                                         while(((dsLinha = bufferedReader.readLine()) != null)&&(!inErroCommit)&&(!this.inFechouImportacao)){
                                                             nrLinha++;
                                                             nrRegistroAtual++;
@@ -218,8 +218,8 @@ public class ImportDataBean implements Serializable{
 
                                                             double vlProgresso = (nrRegistroAtual.doubleValue()/nrRegistroTotal.doubleValue());
                                                             this.pcProgresso = Math.round((vlProgresso) * 100);
-
-                                                            importDataGeoInfoCSV.importar(nrLinha, dsLinha);
+                                                            
+                                                            importDataGeoInfoCSV.importar(nrLinha, dsLinha, qtLinha == nrLinha);
 
                                                             if((nrRegistroAtual % 1000) == 0){
                                                                 try{
@@ -380,6 +380,7 @@ public class ImportDataBean implements Serializable{
                                     fm.setSeverity(FacesMessage.SEVERITY_WARN);
                                     fc.addMessage(null, fm);
                                 }
+                                zipFile.close();
                             }else{
                                 this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, "Não foi possível criar o arquivo: " + file.getName()));
 

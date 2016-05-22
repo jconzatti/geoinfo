@@ -10,6 +10,7 @@ import com.geoinfo.entity.FormaPagamentoVenda;
 import com.geoinfo.entity.FormaPagamentoVendaPK;
 import com.geoinfo.entity.ItemVenda;
 import com.geoinfo.entity.ItemVendaPK;
+import com.geoinfo.entity.Localizacao;
 import com.geoinfo.entity.LocalizacaoDestinoVenda;
 import com.geoinfo.entity.LocalizacaoDestinoVendaPK;
 import com.geoinfo.entity.LocalizacaoOrigemVenda;
@@ -38,6 +39,7 @@ import com.geoinfo.repository.CidadeRepository;
 import com.geoinfo.repository.EstadoRepository;
 import com.geoinfo.repository.LocalizacaoDestinoVendaRepository;
 import com.geoinfo.repository.LocalizacaoOrigemVendaRepository;
+import com.geoinfo.repository.LocalizacaoRepository;
 import com.geoinfo.repository.PaisRepository;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -52,7 +54,6 @@ public class ImportDataGeoInfoCSVVenda extends ImportDataGeoInfoCSV{
     private final ImportDataGeoInfoCSVVendedor importDataGeoInfoVendedor;
     private final ImportDataGeoInfoCSVFormaPagamento importDataGeoInfoFormaPagamento;
     private final ImportDataGeoInfoCSVProduto importDataGeoInfoProduto;
-    
     
     public ImportDataGeoInfoCSVVenda(EntityManager entityManager, PessoaMaster gerente) {
         super(entityManager, gerente);
@@ -73,15 +74,82 @@ public class ImportDataGeoInfoCSVVenda extends ImportDataGeoInfoCSV{
         this.importDataGeoInfoFormaPagamento.setListaGeoInfoLogNode(listaGeoInfoLogNode);
         this.importDataGeoInfoProduto.setListaGeoInfoLogNode(listaGeoInfoLogNode);
     }
+    
+    private void setLocalizacaoVenda(){
+        if(venda != null){
+            Localizacao localizacaoE = null;
+            Localizacao localizacaoC = null;
+            
+            if(venda.getVendaPK().getEstabelecimento() != null)
+                localizacaoE = new LocalizacaoRepository(this.getEntityManager()).getLocalizacaoRecenteAnteriorA(venda.getVendaPK().getEstabelecimento().getCdPessoa(), venda.getDtVenda());
+            
+            if(venda.getCliente() != null)
+                localizacaoC = new LocalizacaoRepository(this.getEntityManager()).getLocalizacaoRecenteAnteriorA(venda.getCliente().getCdPessoa(), venda.getDtVenda());
+            
+            if((localizacaoE != null)&&(localizacaoE.getLocalizacaoPK() != null)){
+                LocalizacaoOrigemVendaPK localizacaoOrigemVendaPK = new LocalizacaoOrigemVendaPK();
+                localizacaoOrigemVendaPK.setVenda(venda);
+
+                LocalizacaoOrigemVendaRepository localizacaoOrigemVendaRepository = new LocalizacaoOrigemVendaRepository(this.getEntityManager());
+                if (localizacaoOrigemVendaRepository.find(localizacaoOrigemVendaPK) == null){
+
+                    LocalizacaoOrigemVenda localizacaoOrigemVenda = new LocalizacaoOrigemVenda();
+                    localizacaoOrigemVenda.setLocalizacaoOrigemVendaPK(localizacaoOrigemVendaPK);
+                    localizacaoOrigemVenda.setCidade(localizacaoE.getLocalizacaoPK().getCidade());
+                    localizacaoOrigemVenda.setDsBairro(localizacaoE.getDsBairro());
+                    localizacaoOrigemVenda.setDsEndereco(localizacaoE.getDsEndereco());
+                    localizacaoOrigemVenda.setDsNumero(localizacaoE.getDsNumero());
+
+                    localizacaoOrigemVendaRepository.insert(localizacaoOrigemVenda);
+                }
+            }
+            
+            if((localizacaoE != null)||(localizacaoC != null)){
+                LocalizacaoDestinoVendaPK localizacaoDestinoVendaPK = new LocalizacaoDestinoVendaPK();
+                localizacaoDestinoVendaPK.setVenda(venda);
+
+                LocalizacaoDestinoVendaRepository localizacaoDestinoVendaRepository = new LocalizacaoDestinoVendaRepository(this.getEntityManager());
+                if (localizacaoDestinoVendaRepository.find(localizacaoDestinoVendaPK) == null){
+                    LocalizacaoDestinoVenda localizacaoDestinoVenda = new LocalizacaoDestinoVenda();
+                    localizacaoDestinoVenda.setLocalizacaoDestinoVendaPK(localizacaoDestinoVendaPK);
+                    
+                    boolean inDefiniu = false;
+                    if((localizacaoC != null)&&(localizacaoC.getLocalizacaoPK() != null)){
+                        localizacaoDestinoVenda.setCidade(localizacaoC.getLocalizacaoPK().getCidade());
+                        localizacaoDestinoVenda.setDsBairro(localizacaoC.getDsBairro());
+                        localizacaoDestinoVenda.setDsEndereco(localizacaoC.getDsEndereco());
+                        localizacaoDestinoVenda.setDsNumero(localizacaoC.getDsNumero());
+                        inDefiniu = true;
+                    }else{
+                        if((localizacaoE != null)&&(localizacaoE.getLocalizacaoPK() != null)){
+                            localizacaoDestinoVenda.setCidade(localizacaoE.getLocalizacaoPK().getCidade());
+                            localizacaoDestinoVenda.setDsBairro(localizacaoE.getDsBairro());
+                            localizacaoDestinoVenda.setDsEndereco(localizacaoE.getDsEndereco());
+                            localizacaoDestinoVenda.setDsNumero(localizacaoE.getDsNumero());
+                            inDefiniu = true;
+                        }
+                    }
+                    
+                    if(inDefiniu) 
+                        localizacaoDestinoVendaRepository.insert(localizacaoDestinoVenda);
+                }
+            }
+        }
+
+    }
 
     @Override
-    public boolean importar(Long nrLinha, String dsLinha) {
+    public boolean importar(long nrLinha, String dsLinha, boolean inUltima) {
         String[] listaVenda = dsLinha.split(";", -1);
+        
+        boolean inImportou = false;
 
         if(listaVenda[0].equalsIgnoreCase("V")){
             if(this.getListaGeoInfoLogNode() != null){
                 this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Importando Linha (" + nrLinha + "): " + dsLinha, nrLinha));
             }
+            
+            setLocalizacaoVenda();
 
             venda = null;
             if(listaVenda.length == 7){
@@ -162,7 +230,7 @@ public class ImportDataGeoInfoCSVVenda extends ImportDataGeoInfoCSV{
                                             vendaRepository.insert(venda);
                                         else
                                             vendaRepository.edit(venda);
-                                        return true;
+                                        inImportou = true;
                                     }else{
                                         if(this.getListaGeoInfoLogNode() != null){
                                             this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, 
@@ -267,7 +335,7 @@ public class ImportDataGeoInfoCSVVenda extends ImportDataGeoInfoCSV{
                                         formaPagamentoVendaRepository.insert(formaPagamentoVenda);
                                     else
                                         formaPagamentoVendaRepository.edit(formaPagamentoVenda);
-                                    return true;
+                                    inImportou = true;
                                 }else{
                                     if(this.getListaGeoInfoLogNode() != null){
                                         this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, 
@@ -354,7 +422,7 @@ public class ImportDataGeoInfoCSVVenda extends ImportDataGeoInfoCSV{
                                             vendedorVendaRepository.insert(vendedorVenda);
                                         else
                                             vendedorVendaRepository.edit(vendedorVenda);
-                                        return true;
+                                        inImportou = true;
                                     }else{
                                         if(this.getListaGeoInfoLogNode() != null){
                                             this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, 
@@ -457,7 +525,7 @@ public class ImportDataGeoInfoCSVVenda extends ImportDataGeoInfoCSV{
                                                     itemVendaRepository.insert(itemVenda);
                                                 else
                                                     itemVendaRepository.edit(itemVenda);
-                                                return true;
+                                                inImportou = true;
                                             }else{
                                                 if(this.getListaGeoInfoLogNode() != null){
                                                     this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, 
@@ -714,7 +782,7 @@ public class ImportDataGeoInfoCSVVenda extends ImportDataGeoInfoCSV{
                                             localizacaoDestinoVendaRepository.insert(localizacaoDestinoVenda);
                                         else
                                             localizacaoDestinoVendaRepository.edit(localizacaoDestinoVenda);
-                                        return true;
+                                        inImportou = true;
                                
                                     }else{
                                         if(this.getListaGeoInfoLogNode() != null){
@@ -954,7 +1022,7 @@ public class ImportDataGeoInfoCSVVenda extends ImportDataGeoInfoCSV{
                                                 localizacaoOrigemVendaRepository.insert(localizacaoOrigemVenda);
                                             else
                                                 localizacaoOrigemVendaRepository.edit(localizacaoOrigemVenda);
-                                            return true;
+                                            inImportou = true;
 
                                         }else{
                                             if(this.getListaGeoInfoLogNode() != null){
@@ -976,19 +1044,19 @@ public class ImportDataGeoInfoCSVVenda extends ImportDataGeoInfoCSV{
                                 }
                             }else{
                                 if(listaVenda[0].equalsIgnoreCase("C") || listaVenda[0].equalsIgnoreCase("LC")){
-                                    return this.importDataGeoInfoCliente.importar(nrLinha, dsLinha);
+                                    inImportou = this.importDataGeoInfoCliente.importar(nrLinha, dsLinha, inUltima);
                                 }else{
                                     if(listaVenda[0].equalsIgnoreCase("D") || listaVenda[0].equalsIgnoreCase("LD")){
-                                        return this.importDataGeoInfoVendedor.importar(nrLinha, dsLinha);
+                                        inImportou = this.importDataGeoInfoVendedor.importar(nrLinha, dsLinha, inUltima);
                                     }else{
                                         if(listaVenda[0].equalsIgnoreCase("E") || listaVenda[0].equalsIgnoreCase("LE")){
-                                            return this.importDataGeoInfoEstabelecimento.importar(nrLinha, dsLinha);
+                                            inImportou = this.importDataGeoInfoEstabelecimento.importar(nrLinha, dsLinha, inUltima);
                                         }else{
                                             if(listaVenda[0].equalsIgnoreCase("G")){
-                                                return this.importDataGeoInfoFormaPagamento.importar(nrLinha, dsLinha);
+                                                inImportou = this.importDataGeoInfoFormaPagamento.importar(nrLinha, dsLinha, inUltima);
                                             }else{
                                                 if(listaVenda[0].equalsIgnoreCase("P")){
-                                                    return this.importDataGeoInfoProduto.importar(nrLinha, dsLinha);
+                                                    inImportou = this.importDataGeoInfoProduto.importar(nrLinha, dsLinha, inUltima);
                                                 }else{
                                                     if(this.getListaGeoInfoLogNode() != null){
                                                         this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, 
@@ -1005,7 +1073,11 @@ public class ImportDataGeoInfoCSVVenda extends ImportDataGeoInfoCSV{
                 }
             }
         }
-        return false;
+        
+        if(inUltima)
+            setLocalizacaoVenda();
+        
+        return inImportou;
     }
     
 }

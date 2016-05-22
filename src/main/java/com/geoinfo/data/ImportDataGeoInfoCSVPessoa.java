@@ -31,7 +31,7 @@ public abstract class ImportDataGeoInfoCSVPessoa extends ImportDataGeoInfoCSV{
     }
 
     @Override
-    public boolean importar(Long nrLinha, String dsLinha) {
+    public boolean importar(long nrLinha, String dsLinha, boolean inUltima) {
         String[] listaPessoa = dsLinha.split(";", -1);
         if(this.getListaGeoInfoLogNode() != null){
             this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Importando linha (" + nrLinha + "): " + dsLinha, nrLinha));

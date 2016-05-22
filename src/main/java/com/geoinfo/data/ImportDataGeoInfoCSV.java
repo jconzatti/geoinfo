@@ -9,5 +9,5 @@ public abstract class ImportDataGeoInfoCSV extends ImportDataGeoInfo{
         super(entityManager, gerente);
     }
     
-    public abstract boolean importar(Long nrLinha, String dsLinha);
+    public abstract boolean importar(long nrLinha, String dsLinha, boolean inUltima);
 }

@@ -17,7 +17,7 @@ public class ImportDataGeoInfoCSVFormaPagamento extends ImportDataGeoInfoCSV{
     }
 
     @Override
-    public boolean importar(Long nrLinha, String dsLinha) {
+    public boolean importar(long nrLinha, String dsLinha, boolean inUltima) {
         String[] listaFormaPagamento = dsLinha.split(";", -1);
         if(this.getListaGeoInfoLogNode() != null){
             this.getListaGeoInfoLogNode().add(new GeoInfoLogNode(EGeoInfoLogType.LOG_INFO, "Importando Linha (" + nrLinha + "): " + dsLinha, nrLinha));

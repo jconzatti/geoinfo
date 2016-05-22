@@ -3,6 +3,7 @@ package com.geoinfo.repository;
 import com.geoinfo.entity.CidadePK;
 import com.geoinfo.entity.Localizacao;
 import com.geoinfo.entity.LocalizacaoPK;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -29,6 +30,22 @@ public class LocalizacaoRepository extends Repository<Localizacao, LocalizacaoPK
                 + "(select max(l1.localizacaoPK.dtLocalizacao) from Localizacao l1 "
                 + " where l1.localizacaoPK.pessoa.cdPessoa = :cdPessoa)")
                 .setParameter("cdPessoa", cdPessoa);
+        List<Localizacao> listaLocalizacao = query.getResultList();
+        if(listaLocalizacao.isEmpty())
+            return null;
+        else
+            return listaLocalizacao.get(listaLocalizacao.size()-1);
+    }
+    
+    public Localizacao getLocalizacaoRecenteAnteriorA(Long cdPessoa, Date dtAnterior){
+        Query query = this.manager.createQuery("select l from Localizacao l "
+                + "where l.localizacaoPK.pessoa.cdPessoa = :cdPessoa "
+                + "and l.localizacaoPK.dtLocalizacao = "
+                + "(select max(l1.localizacaoPK.dtLocalizacao) from Localizacao l1 "
+                + " where l1.localizacaoPK.pessoa.cdPessoa = :cdPessoa "
+                + " and l1.localizacaoPK.dtLocalizacao <= :dtAnterior)")
+                .setParameter("cdPessoa", cdPessoa)
+                .setParameter("dtAnterior", dtAnterior);
         List<Localizacao> listaLocalizacao = query.getResultList();
         if(listaLocalizacao.isEmpty())
             return null;
