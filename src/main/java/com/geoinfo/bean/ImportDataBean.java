@@ -165,7 +165,7 @@ public class ImportDataBean implements Serializable{
 
                                         this.dsMensagem = "Contando registros a serem importadas!";
 
-                                        Long nrRegistroTotal = (long) listaZEXMLNFE.size();
+                                        long nrRegistroTotal = (long) listaZEXMLNFE.size();
                                         Iterator itZE = listaZEGeoInfo.iterator();
                                         while((itZE.hasNext())&&(!this.inFechouImportacao)){
                                             ZipEntry ze = (ZipEntry) itZE.next();
@@ -188,7 +188,7 @@ public class ImportDataBean implements Serializable{
                                         }
 
                                         boolean inErroCommit = false;
-                                        Long nrRegistroAtual = (long) 0;
+                                        long nrRegistroAtual = (long) 0;
 
                                         if(listaZEGeoInfo.size() > 0){
                                             itZE = listaZEGeoInfo.iterator();
@@ -203,20 +203,22 @@ public class ImportDataBean implements Serializable{
                                                 if(importDataGeoInfoCSV != null){
                                                     importDataGeoInfoCSV.setListaGeoInfoLogNode(listaGeoInfoLogNode);
                                                     try {
-                                                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(zipFile.getInputStream(ze)));
-
-                                                        entityManager.getTransaction().begin();
-
                                                         String dsLinha;
                                                         long nrLinha = 0;
+                                                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(zipFile.getInputStream(ze)));
                                                         long qtLinha = bufferedReader.lines().count();
+                                                        bufferedReader.close();
+                                                        
+                                                        entityManager.getTransaction().begin();
+                                                        
+                                                        bufferedReader = new BufferedReader(new InputStreamReader(zipFile.getInputStream(ze)));
                                                         while(((dsLinha = bufferedReader.readLine()) != null)&&(!inErroCommit)&&(!this.inFechouImportacao)){
                                                             nrLinha++;
                                                             nrRegistroAtual++;
 
                                                             this.dsMensagem = "Importando linha " + nrLinha + " do arquivo " + dsArquivo;
 
-                                                            double vlProgresso = (nrRegistroAtual.doubleValue()/nrRegistroTotal.doubleValue());
+                                                            double vlProgresso = (double) (nrRegistroAtual/nrRegistroTotal);
                                                             this.pcProgresso = Math.round((vlProgresso) * 100);
                                                             
                                                             importDataGeoInfoCSV.importar(nrLinha, dsLinha, qtLinha == nrLinha);
@@ -292,7 +294,7 @@ public class ImportDataBean implements Serializable{
 
                                                     this.dsMensagem = "Importando arquivo " + dsArquivo;
 
-                                                    double vlProgresso = (nrRegistroAtual.doubleValue()/nrRegistroTotal.doubleValue());
+                                                    double vlProgresso = (double) (nrRegistroAtual/nrRegistroTotal);
                                                     this.pcProgresso = Math.round((vlProgresso) * 100);
 
                                                     try {
