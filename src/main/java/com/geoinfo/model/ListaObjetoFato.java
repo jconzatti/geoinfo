@@ -99,40 +99,35 @@ public class ListaObjetoFato<T extends IGroupable> {
         if(fato.isInFatoVenda()){
             if(fato.getCdFato().equalsIgnoreCase("VLVENDA")){
                 dsSelect += "sum(iv.vlProduto * iv.qtProduto) ";
-                dsSelect += "from Localizacao loc, ItemVenda iv "
-                          + "inner join iv.itemVendaPK.venda v ";
+                dsSelect += "from ItemVenda iv "
+                          + "inner join iv.itemVendaPK.venda v, ";
             }else if(fato.getCdFato().equalsIgnoreCase("QTVENDA")){
                 dsSelect += "count(v.cdVenda) ";
-                dsSelect += "from Localizacao loc, Venda v ";
+                dsSelect += "from Venda v, ";
             }else if(fato.getCdFato().equalsIgnoreCase("QTITEMVENDA")){
                 dsSelect += "sum(iv.qtProduto) ";
-                dsSelect += "from Localizacao loc, ItemVenda iv "
-                          + "inner join iv.itemVendaPK.venda v ";
+                dsSelect += "from ItemVenda iv "
+                          + "inner join iv.itemVendaPK.venda v, ";
             }else if(fato.getCdFato().equalsIgnoreCase("QTCLIENTE")){
                 dsSelect += "count(distinct v.cliente) ";
-                dsSelect += "from Localizacao loc, Venda v ";
+                dsSelect += "from Venda v, ";
             }else if(fato.getCdFato().equalsIgnoreCase("VLFORMAPAGAMENTO")){
                 dsSelect += "sum(fv.vlFormaPagamento) ";
-                dsSelect += "from Localizacao loc, FormaPagamentoVenda fv "
-                          + "inner join fv.formaPagamentoVendaPK.venda v ";
+                dsSelect += "from FormaPagamentoVenda fv "
+                          + "inner join fv.formaPagamentoVendaPK.venda v, ";
             }else if(fato.getCdFato().equalsIgnoreCase("VLCOMISSAO")){
                 dsSelect += "sum(vv.vlComissao) ";
-                dsSelect += "from Localizacao loc, VendedorVenda vv "
-                          + "inner join vv.vendedorVendaPK.venda v ";
+                dsSelect += "from VendedorVenda vv "
+                          + "inner join vv.vendedorVendaPK.venda v, ";
             }else if(fato.getCdFato().equalsIgnoreCase("VLDESCONTO")){
                 dsSelect += "sum(v.vlDesconto) ";
-                dsSelect += "from Localizacao loc, Venda v ";
+                dsSelect += "from Venda v, ";
             }
-            dsSelect += "inner join v.cliente cl "
-                      + "inner join loc.localizacaoPK.cidade ci "
+            dsSelect += "LocalizacaoDestinoVenda loc "
+                      + "inner join loc.cidade ci "
                       + "inner join ci.cidadePK.estado es "
                       + "inner join es.estadoPK.pais pa "
-                      + "where cl = loc.localizacaoPK.pessoa "
-                      + "and loc.localizacaoPK.dtLocalizacao = "
-                      + "(select max(loc1.localizacaoPK.dtLocalizacao) "
-                      + " from Localizacao loc1 "
-                      + " where loc1.localizacaoPK.pessoa = cl "
-                      + " and loc1.localizacaoPK.dtLocalizacao <= v.dtVenda) ";
+                      + "where loc.localizacaoDestinoVendaPK.venda = v ";
             switch(objetoFatoPeriodo.getPeriodoIntervalo().getIdPeriodo()){
                 case ANO:
                     dsSelect += "and year(v.dtVenda)";
