@@ -218,7 +218,7 @@ public class ImportDataBean implements Serializable{
 
                                                             this.dsMensagem = "Importando linha " + nrLinha + " do arquivo " + dsArquivo;
 
-                                                            double vlProgresso = (double) (nrRegistroAtual/nrRegistroTotal);
+                                                            double vlProgresso = ((double)nrRegistroAtual/(double)nrRegistroTotal);
                                                             this.pcProgresso = Math.round((vlProgresso) * 100);
                                                             
                                                             importDataGeoInfoCSV.importar(nrLinha, dsLinha, qtLinha == nrLinha);
@@ -294,7 +294,7 @@ public class ImportDataBean implements Serializable{
 
                                                     this.dsMensagem = "Importando arquivo " + dsArquivo;
 
-                                                    double vlProgresso = (double) (nrRegistroAtual/nrRegistroTotal);
+                                                    double vlProgresso = ((double)nrRegistroAtual/(double)nrRegistroTotal);
                                                     this.pcProgresso = Math.round((vlProgresso) * 100);
 
                                                     try {
