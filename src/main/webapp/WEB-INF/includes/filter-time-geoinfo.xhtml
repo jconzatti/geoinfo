@@ -10,17 +10,17 @@
             <f:ajax event="change" render=":form-filter:pgrid-periodo01" execute=":form-filter:pgrid-periodo01"/>
         </p:selectOneMenu>
         <h:panelGroup>
-            <h:inputHidden rendered="#{(periodoBean.idPeriodoABOrd == 1) or (periodoBean.idPeriodoABOrd == 0)}"/>
+            <h:inputHidden rendered="#{(periodoBean.idPeriodoAB == EPeriodoType.MES) or (periodoBean.idPeriodoAB == EPeriodoType.DATA)}"/>
             <p:selectOneMenu value="#{periodoBean.idDiaA}" 
-                             rendered="#{periodoBean.idPeriodoABOrd == 2}"
+                             rendered="#{periodoBean.idPeriodoAB == EPeriodoType.ANO}"
                              style="width: 45px">
                 <f:selectItems value="#{periodoBean.listaIdDia}"/>
             </p:selectOneMenu>
         </h:panelGroup>
         <h:panelGroup>
-            <h:inputHidden rendered="#{periodoBean.idPeriodoABOrd == 0}"/>
+            <h:inputHidden rendered="#{periodoBean.idPeriodoAB == EPeriodoType.DATA}"/>
             <p:selectOneMenu value="#{periodoBean.idMesA}"
-                             rendered="#{(periodoBean.idPeriodoABOrd == 2) or (periodoBean.idPeriodoABOrd == 1)}"
+                             rendered="#{(periodoBean.idPeriodoAB == EPeriodoType.ANO) or (periodoBean.idPeriodoAB == EPeriodoType.MES)}"
                              style="width: 85px">
                 <f:selectItems value="#{periodoBean.listaIdMes}"/>
             </p:selectOneMenu>
@@ -37,17 +37,17 @@
 
         <h:inputHidden rendered="#{periodoBean.inAteAB}"/>
         <h:panelGroup rendered="#{periodoBean.inAteAB}">
-            <h:inputHidden rendered="#{(periodoBean.idPeriodoABOrd == 1) or periodoBean.idPeriodoABOrd == 0}"/>
+            <h:inputHidden rendered="#{(periodoBean.idPeriodoAB == EPeriodoType.MES) or periodoBean.idPeriodoAB == EPeriodoType.DATA}"/>
             <p:selectOneMenu value="#{periodoBean.idDiaB}" 
-                             rendered="#{periodoBean.idPeriodoABOrd == 2}"
+                             rendered="#{periodoBean.idPeriodoAB == EPeriodoType.ANO}"
                              style="width: 45px">
                 <f:selectItems value="#{periodoBean.listaIdDia}"/>
             </p:selectOneMenu>
         </h:panelGroup>
         <h:panelGroup rendered="#{periodoBean.inAteAB}">
-            <h:inputHidden rendered="#{periodoBean.idPeriodoABOrd == 0}"/>
+            <h:inputHidden rendered="#{periodoBean.idPeriodoAB == EPeriodoType.DATA}"/>
             <p:selectOneMenu value="#{periodoBean.idMesB}"
-                             rendered="#{(periodoBean.idPeriodoABOrd == 2) or (periodoBean.idPeriodoABOrd == 1)}"
+                             rendered="#{(periodoBean.idPeriodoAB == EPeriodoType.ANO) or (periodoBean.idPeriodoAB == EPeriodoType.MES)}"
                              style="width: 85px">
                 <f:selectItems value="#{periodoBean.listaIdMes}"/>
             </p:selectOneMenu>
@@ -75,17 +75,17 @@
             <f:ajax event="change" render=":form-filter:pgrid-periodo02" execute=":form-filter:pgrid-periodo02"/>
         </p:selectOneMenu>
         <h:panelGroup rendered="#{periodoBean.inCompararCom}">
-            <h:inputHidden rendered="#{(periodoBean.idPeriodoCDOrd == 1) or (periodoBean.idPeriodoCDOrd == 0)}"/>
+            <h:inputHidden rendered="#{(periodoBean.idPeriodoCD == EPeriodoType.MES) or (periodoBean.idPeriodoCD == EPeriodoType.DATA)}"/>
             <p:selectOneMenu value="#{periodoBean.idDiaC}" 
-                             rendered="#{periodoBean.idPeriodoCDOrd == 2}"
+                             rendered="#{periodoBean.idPeriodoCD == EPeriodoType.ANO}"
                              style="width: 45px">
                 <f:selectItems value="#{periodoBean.listaIdDia}"/>
             </p:selectOneMenu>
         </h:panelGroup>
         <h:panelGroup rendered="#{periodoBean.inCompararCom}">
-            <h:inputHidden rendered="#{periodoBean.idPeriodoCDOrd == 0}"/>
+            <h:inputHidden rendered="#{periodoBean.idPeriodoCD == EPeriodoType.DATA}"/>
             <p:selectOneMenu value="#{periodoBean.idMesC}"
-                             rendered="#{(periodoBean.idPeriodoCDOrd == 2) or (periodoBean.idPeriodoCDOrd == 1)}"
+                             rendered="#{(periodoBean.idPeriodoCD == EPeriodoType.ANO) or (periodoBean.idPeriodoCD == EPeriodoType.MES)}"
                              style="width: 85px">
                 <f:selectItems value="#{periodoBean.listaIdMes}"/>
             </p:selectOneMenu>
@@ -104,17 +104,17 @@
 
         <h:inputHidden rendered="#{periodoBean.inCompararCom and periodoBean.inAteCD}"/>
         <h:panelGroup rendered="#{periodoBean.inCompararCom and periodoBean.inAteCD}">
-            <h:inputHidden rendered="#{(periodoBean.idPeriodoCDOrd == 1) or (periodoBean.idPeriodoCDOrd == 0)}"/>
+            <h:inputHidden rendered="#{(periodoBean.idPeriodoCD == EPeriodoType.MES) or (periodoBean.idPeriodoCD == EPeriodoType.DATA)}"/>
             <p:selectOneMenu value="#{periodoBean.idDiaD}" 
-                             rendered="#{periodoBean.idPeriodoCDOrd == 2}"
+                             rendered="#{periodoBean.idPeriodoCD == EPeriodoType.ANO}"
                              style="width: 45px">
                 <f:selectItems value="#{periodoBean.listaIdDia}"/>
             </p:selectOneMenu>
         </h:panelGroup>
         <h:panelGroup rendered="#{periodoBean.inCompararCom and periodoBean.inAteCD}">
-            <h:inputHidden rendered="#{periodoBean.idPeriodoCDOrd == 0}"/>
+            <h:inputHidden rendered="#{periodoBean.idPeriodoCD == EPeriodoType.DATA}"/>
             <p:selectOneMenu value="#{periodoBean.idMesD}"
-                             rendered="#{(periodoBean.idPeriodoCDOrd == 2) or (periodoBean.idPeriodoCDOrd == 1)}"
+                             rendered="#{(periodoBean.idPeriodoCD == EPeriodoType.ANO) or (periodoBean.idPeriodoCD == EPeriodoType.MES)}"
                              style="width: 85px">
                 <f:selectItems value="#{periodoBean.listaIdMes}"/>
             </p:selectOneMenu>

@@ -26,17 +26,20 @@
        
     <h:form id="form-filter">
         <p:panelMenu>
-            <p:submenu label="Informação (O que?)">
+            <p:submenu label="Informação (O que?)"
+                       expanded="true">
                 <p:menuitem>
                     <ui:include src="/WEB-INF/includes/filter-info-geoinfo.xhtml"/>
                 </p:menuitem>
             </p:submenu>
-            <p:submenu label="Período (Quando?)">
+            <p:submenu label="Período (Quando?)"
+                       expanded="true">
                 <p:menuitem>
                     <ui:include src="/WEB-INF/includes/filter-time-geoinfo.xhtml"/>
                 </p:menuitem>
             </p:submenu>
-            <p:submenu label="Localização (Onde?)">
+            <p:submenu label="Localização (Onde?)"
+                       expanded="true">
                 <p:menuitem>
                     <h:outputText value="Filtre a região desejada"/>
                 </p:menuitem>

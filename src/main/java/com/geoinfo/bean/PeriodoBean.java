@@ -237,14 +237,6 @@ public class PeriodoBean implements Serializable{
         this.idPeriodoCD = idPeriodoCD;
     }
     
-    public int getIdPeriodoABOrd(){
-        return this.idPeriodoAB.ordinal();
-    }
-    
-    public int getIdPeriodoCDOrd(){
-        return this.idPeriodoCD.ordinal();
-    }
-    
     public void registrar(){
         boolean inErro = false;
         
