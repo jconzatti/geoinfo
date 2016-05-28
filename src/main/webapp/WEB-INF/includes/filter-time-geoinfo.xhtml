@@ -3,58 +3,59 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core">
-    <h:panelGrid id="pgrid-periodo01" columns="5" cellpadding="0" cellspacing="3">
+    <p:spacer/>
+    <h:panelGrid id="pgrid-periodo01" 
+                 columns="3">
         <p:selectOneMenu value="#{periodoBean.idPeriodoAB}"
-                         style="width: 55px">
+                         style="width: 35px">
             <f:selectItems value="#{periodoBean.listaIdPeriodo}"/>
-            <f:ajax event="change" render=":form-filter:pgrid-periodo01" execute=":form-filter:pgrid-periodo01"/>
+            <f:ajax event="change" 
+                    render=":form-filter:pgrid-periodo01" 
+                    execute=":form-filter:pgrid-periodo01"/>
         </p:selectOneMenu>
-        <h:panelGroup>
-            <h:inputHidden rendered="#{(periodoBean.idPeriodoAB == EPeriodoType.MES) or (periodoBean.idPeriodoAB == EPeriodoType.DATA)}"/>
-            <p:selectOneMenu value="#{periodoBean.idDiaA}" 
-                             rendered="#{periodoBean.idPeriodoAB == EPeriodoType.ANO}"
-                             style="width: 45px">
-                <f:selectItems value="#{periodoBean.listaIdDia}"/>
-            </p:selectOneMenu>
-        </h:panelGroup>
-        <h:panelGroup>
-            <h:inputHidden rendered="#{periodoBean.idPeriodoAB == EPeriodoType.DATA}"/>
-            <p:selectOneMenu value="#{periodoBean.idMesA}"
-                             rendered="#{(periodoBean.idPeriodoAB == EPeriodoType.ANO) or (periodoBean.idPeriodoAB == EPeriodoType.MES)}"
-                             style="width: 85px">
-                <f:selectItems value="#{periodoBean.listaIdMes}"/>
-            </p:selectOneMenu>
-        </h:panelGroup>
+        <p:calendar value="#{periodoBean.dtPeriodoA}"
+                    pattern="dd/MM/yyyy"
+                    mask="true"
+                    size="10" 
+                    rendered="#{(periodoBean.idPeriodoAB.toString() == 'Data')}"/>
+        <p:selectOneMenu value="#{periodoBean.idMesA}"
+                         style="width: 65px"
+                         rendered="#{(periodoBean.idPeriodoAB.toString() == 'Mês')}">
+            <f:selectItems value="#{periodoBean.listaIdMes}"/>
+        </p:selectOneMenu>
+        <h:outputLabel value="de"
+                       rendered="#{(periodoBean.idPeriodoAB.toString() == 'Mês')}"/>
+        <h:inputHidden rendered="#{(periodoBean.idPeriodoAB.toString() == 'Mês')}"/>
         <p:selectOneMenu value="#{periodoBean.idAnoA}"
-                         style="width: 60px">
+                         style="width: 65px"
+                         rendered="#{(periodoBean.idPeriodoAB.toString() == 'Mês') or (periodoBean.idPeriodoAB.toString() == 'Ano')}">
             <f:selectItems value="#{periodoBean.listaIdAno}"/>
         </p:selectOneMenu>
         <p:selectBooleanButton value="#{periodoBean.inAteAB}"
-                               onLabel="até" offLabel="até"
-                               style="width: 35px">
-            <f:ajax event="change" render=":form-filter:pgrid-periodo01" execute=":form-filter:pgrid-periodo01"/>
+                               onLabel="até" 
+                               offLabel="até">
+            <f:ajax event="change" 
+                    render=":form-filter:pgrid-periodo01" 
+                    execute=":form-filter:pgrid-periodo01"/>
         </p:selectBooleanButton>
 
         <h:inputHidden rendered="#{periodoBean.inAteAB}"/>
-        <h:panelGroup rendered="#{periodoBean.inAteAB}">
-            <h:inputHidden rendered="#{(periodoBean.idPeriodoAB == EPeriodoType.MES) or periodoBean.idPeriodoAB == EPeriodoType.DATA}"/>
-            <p:selectOneMenu value="#{periodoBean.idDiaB}" 
-                             rendered="#{periodoBean.idPeriodoAB == EPeriodoType.ANO}"
-                             style="width: 45px">
-                <f:selectItems value="#{periodoBean.listaIdDia}"/>
-            </p:selectOneMenu>
-        </h:panelGroup>
-        <h:panelGroup rendered="#{periodoBean.inAteAB}">
-            <h:inputHidden rendered="#{periodoBean.idPeriodoAB == EPeriodoType.DATA}"/>
-            <p:selectOneMenu value="#{periodoBean.idMesB}"
-                             rendered="#{(periodoBean.idPeriodoAB == EPeriodoType.ANO) or (periodoBean.idPeriodoAB == EPeriodoType.MES)}"
-                             style="width: 85px">
-                <f:selectItems value="#{periodoBean.listaIdMes}"/>
-            </p:selectOneMenu>
-        </h:panelGroup>
+        <p:calendar value="#{periodoBean.dtPeriodoB}"
+                    pattern="dd/MM/yyyy"
+                    mask="true"
+                    size="10" 
+                    rendered="#{(periodoBean.inAteAB) and (periodoBean.idPeriodoAB.toString() == 'Data')}"/>
+        <p:selectOneMenu value="#{periodoBean.idMesB}"
+                         style="width: 65px"
+                         rendered="#{(periodoBean.inAteAB) and (periodoBean.idPeriodoAB.toString() == 'Mês')}">
+            <f:selectItems value="#{periodoBean.listaIdMes}"/>
+        </p:selectOneMenu>
+        <h:outputLabel value="de"
+                       rendered="#{(periodoBean.inAteAB) and (periodoBean.idPeriodoAB.toString() == 'Mês')}"/>
+        <h:inputHidden rendered="#{(periodoBean.inAteAB) and (periodoBean.idPeriodoAB.toString() == 'Mês')}"/>
         <p:selectOneMenu value="#{periodoBean.idAnoB}"
-                         rendered="#{periodoBean.inAteAB}"
-                         style="width: 60px">
+                         style="width: 65px"
+                         rendered="#{(periodoBean.inAteAB) and ((periodoBean.idPeriodoAB.toString() == 'Mês') or (periodoBean.idPeriodoAB.toString() == 'Ano'))}">
             <f:selectItems value="#{periodoBean.listaIdAno}"/>
         </p:selectOneMenu>
         <h:inputHidden rendered="#{periodoBean.inAteAB}"/>
@@ -63,67 +64,69 @@
     <p:selectBooleanButton value="#{periodoBean.inCompararCom}"
                            onLabel="Comparar Com" 
                            offLabel="Comparar Com"
-                           style="margin: 5px">
-        <f:ajax event="change" render=":form-filter:pgrid-periodo02" execute=":form-filter:pgrid-periodo02"/>
+                           style="width: 210px">
+        <f:ajax event="change" 
+                render=":form-filter:pgrid-periodo02" 
+                execute=":form-filter:pgrid-periodo02"/>
     </p:selectBooleanButton>
 
-    <h:panelGrid id="pgrid-periodo02" columns="5" cellpadding="0" cellspacing="3">
-        <p:selectOneMenu value="#{periodoBean.idPeriodoCD}" 
-                         rendered="#{periodoBean.inCompararCom}"
-                         style="width: 55px">
+    <h:panelGrid id="pgrid-periodo02" 
+                 columns="3">
+        <p:selectOneMenu value="#{periodoBean.idPeriodoCD}"
+                         style="width: 35px" 
+                         rendered="#{periodoBean.inCompararCom}">
             <f:selectItems value="#{periodoBean.listaIdPeriodo}"/>
-            <f:ajax event="change" render=":form-filter:pgrid-periodo02" execute=":form-filter:pgrid-periodo02"/>
+            <f:ajax event="change" 
+                    render=":form-filter:pgrid-periodo02" 
+                    execute=":form-filter:pgrid-periodo02"/>
         </p:selectOneMenu>
-        <h:panelGroup rendered="#{periodoBean.inCompararCom}">
-            <h:inputHidden rendered="#{(periodoBean.idPeriodoCD == EPeriodoType.MES) or (periodoBean.idPeriodoCD == EPeriodoType.DATA)}"/>
-            <p:selectOneMenu value="#{periodoBean.idDiaC}" 
-                             rendered="#{periodoBean.idPeriodoCD == EPeriodoType.ANO}"
-                             style="width: 45px">
-                <f:selectItems value="#{periodoBean.listaIdDia}"/>
-            </p:selectOneMenu>
-        </h:panelGroup>
-        <h:panelGroup rendered="#{periodoBean.inCompararCom}">
-            <h:inputHidden rendered="#{periodoBean.idPeriodoCD == EPeriodoType.DATA}"/>
-            <p:selectOneMenu value="#{periodoBean.idMesC}"
-                             rendered="#{(periodoBean.idPeriodoCD == EPeriodoType.ANO) or (periodoBean.idPeriodoCD == EPeriodoType.MES)}"
-                             style="width: 85px">
-                <f:selectItems value="#{periodoBean.listaIdMes}"/>
-            </p:selectOneMenu>
-        </h:panelGroup>
+        <p:calendar value="#{periodoBean.dtPeriodoC}"
+                    pattern="dd/MM/yyyy"
+                    mask="true"
+                    size="10" 
+                    rendered="#{(periodoBean.inCompararCom) and (periodoBean.idPeriodoCD.toString() == 'Data')}"/>
+        <p:selectOneMenu value="#{periodoBean.idMesC}"
+                         style="width: 65px"
+                         rendered="#{(periodoBean.inCompararCom) and (periodoBean.idPeriodoCD.toString() == 'Mês')}">
+            <f:selectItems value="#{periodoBean.listaIdMes}"/>
+        </p:selectOneMenu>
+        <h:outputLabel value="de"
+                       rendered="#{(periodoBean.inCompararCom) and (periodoBean.idPeriodoCD.toString() == 'Mês')}"/>
+        <h:inputHidden rendered="#{(periodoBean.inCompararCom) and (periodoBean.idPeriodoCD.toString() == 'Mês')}"/>
         <p:selectOneMenu value="#{periodoBean.idAnoC}"
-                         rendered="#{periodoBean.inCompararCom}"
-                         style="width: 60px">
+                         style="width: 65px"
+                         rendered="#{(periodoBean.inCompararCom) and ((periodoBean.idPeriodoCD.toString() == 'Mês') or (periodoBean.idPeriodoCD.toString() == 'Ano'))}">
             <f:selectItems value="#{periodoBean.listaIdAno}"/>
         </p:selectOneMenu>
         <p:selectBooleanButton value="#{periodoBean.inAteCD}"
-                               rendered="#{periodoBean.inCompararCom}"
-                               onLabel="até" offLabel="até"
-                               style="width: 35px">
-            <f:ajax event="change" render=":form-filter:pgrid-periodo02" execute=":form-filter:pgrid-periodo02"/>
+                               onLabel="até" 
+                               offLabel="até"
+                               rendered="#{periodoBean.inCompararCom}">
+            <f:ajax event="change" 
+                    render=":form-filter:pgrid-periodo02" 
+                    execute=":form-filter:pgrid-periodo02"/>
         </p:selectBooleanButton>
 
-        <h:inputHidden rendered="#{periodoBean.inCompararCom and periodoBean.inAteCD}"/>
-        <h:panelGroup rendered="#{periodoBean.inCompararCom and periodoBean.inAteCD}">
-            <h:inputHidden rendered="#{(periodoBean.idPeriodoCD == EPeriodoType.MES) or (periodoBean.idPeriodoCD == EPeriodoType.DATA)}"/>
-            <p:selectOneMenu value="#{periodoBean.idDiaD}" 
-                             rendered="#{periodoBean.idPeriodoCD == EPeriodoType.ANO}"
-                             style="width: 45px">
-                <f:selectItems value="#{periodoBean.listaIdDia}"/>
-            </p:selectOneMenu>
-        </h:panelGroup>
-        <h:panelGroup rendered="#{periodoBean.inCompararCom and periodoBean.inAteCD}">
-            <h:inputHidden rendered="#{periodoBean.idPeriodoCD == EPeriodoType.DATA}"/>
-            <p:selectOneMenu value="#{periodoBean.idMesD}"
-                             rendered="#{(periodoBean.idPeriodoCD == EPeriodoType.ANO) or (periodoBean.idPeriodoCD == EPeriodoType.MES)}"
-                             style="width: 85px">
-                <f:selectItems value="#{periodoBean.listaIdMes}"/>
-            </p:selectOneMenu>
-        </h:panelGroup>
+        <h:inputHidden rendered="#{(periodoBean.inCompararCom) and (periodoBean.inAteCD)}"/>
+        <p:calendar value="#{periodoBean.dtPeriodoD}"
+                    pattern="dd/MM/yyyy"
+                    mask="true"
+                    size="10" 
+                    rendered="#{(periodoBean.inCompararCom) and (periodoBean.inAteCD) and (periodoBean.idPeriodoCD.toString() == 'Data')}"/>
+        <p:selectOneMenu value="#{periodoBean.idMesD}"
+                         style="width: 65px"
+                         rendered="#{(periodoBean.inCompararCom) and (periodoBean.inAteCD) and (periodoBean.idPeriodoCD.toString() == 'Mês')}">
+            <f:selectItems value="#{periodoBean.listaIdMes}"/>
+        </p:selectOneMenu>
+        <h:outputLabel value="de"
+                       rendered="#{(periodoBean.inCompararCom) and (periodoBean.inAteCD) and (periodoBean.idPeriodoCD.toString() == 'Mês')}"/>
+        <h:inputHidden rendered="#{(periodoBean.inCompararCom) and (periodoBean.inAteCD) and (periodoBean.idPeriodoCD.toString() == 'Mês')}"/>
         <p:selectOneMenu value="#{periodoBean.idAnoD}"
-                         rendered="#{periodoBean.inCompararCom and periodoBean.inAteCD}"
-                         style="width: 60px">
+                         style="width: 65px"
+                         rendered="#{(periodoBean.inCompararCom) and (periodoBean.inAteCD) and ((periodoBean.idPeriodoCD.toString() == 'Mês') or (periodoBean.idPeriodoCD.toString() == 'Ano'))}">
             <f:selectItems value="#{periodoBean.listaIdAno}"/>
         </p:selectOneMenu>
-        <h:inputHidden rendered="#{periodoBean.inCompararCom and periodoBean.inAteCD}"/>
+        <h:inputHidden rendered="#{(periodoBean.inCompararCom) and (periodoBean.inAteCD)}"/>
     </h:panelGrid>   
+    <p:spacer/>
 </ui:composition>
