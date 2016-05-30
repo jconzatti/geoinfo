@@ -507,8 +507,8 @@ public class MapBuilderBean implements Serializable{
                     sbuffer.append("    minResolution: "); 
                     sbuffer.append(rgps.getDsMinResolution()); 
                     sbuffer.append(",\n");
-                    sbuffer.append("    source: new ol.source.GeoJSON({\n");
-                    sbuffer.append("        projection: 'EPSG:3857',\n");
+                    sbuffer.append("    source: new ol.source.Vector({\n");
+                    sbuffer.append("        format: new ol.format.GeoJSON(),\n");
                     sbuffer.append("        url: \"/geoinfo/faces/javax.faces.resource/data/"); 
                     sbuffer.append(rgps.getDsGeoJSON()); 
                     sbuffer.append("\"\n");
