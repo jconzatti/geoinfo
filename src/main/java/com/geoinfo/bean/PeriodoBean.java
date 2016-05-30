@@ -23,11 +23,8 @@ import javax.servlet.http.HttpSession;
 @SessionScoped
 public class PeriodoBean implements Serializable{
     private List<EPeriodoType> listaIdPeriodo;
-    //private List<Integer> listaIdDia;
     private List<EPeriodoMesType> listaIdMes;
     private List<Integer> listaIdAno;
-    //private int idAnoA, idAnoB, idAnoC, idAnoD, idDiaA, idDiaB, idDiaC, idDiaD;
-    //private EPeriodoMesType idMesA, idMesB, idMesC, idMesD;
     private Date dtPeriodoA, dtPeriodoB, dtPeriodoC, dtPeriodoD;
     private boolean inCompararCom, inAteAB, inAteCD;
     private EPeriodoType idPeriodoAB, idPeriodoCD;
@@ -35,10 +32,6 @@ public class PeriodoBean implements Serializable{
     public PeriodoBean(){
         this.listaIdPeriodo = new ArrayList<EPeriodoType>();
         this.listaIdPeriodo.addAll(Arrays.asList(EPeriodoType.values()));
-        
-        /*this.listaIdDia = new ArrayList<Integer>();
-        for(int i = 1; i < 32; i++)
-            this.listaIdDia.add(i);*/
         
         this.listaIdMes = new ArrayList<EPeriodoMesType>();
         this.listaIdMes.addAll(Arrays.asList(EPeriodoMesType.values()));
@@ -49,30 +42,13 @@ public class PeriodoBean implements Serializable{
         
         idPeriodoAB = EPeriodoType.ANO;
         dtPeriodoA = Calendar.getInstance().getTime();
-        //idAnoA = Calendar.getInstance().get(Calendar.YEAR);;
-        //idMesA = EPeriodoMesType.values()[Calendar.getInstance().get(Calendar.MONTH)];
-        //idDiaA = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-        
         inAteAB = false;
-        
         dtPeriodoB = Calendar.getInstance().getTime();
-        //idAnoB = Calendar.getInstance().get(Calendar.YEAR);
-        //idMesB = EPeriodoMesType.values()[Calendar.getInstance().get(Calendar.MONTH)];
-        //idDiaB = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-        
-        
+        inCompararCom = false;
         idPeriodoCD = EPeriodoType.ANO;
         dtPeriodoC = Calendar.getInstance().getTime();
-        //idAnoC = Calendar.getInstance().get(Calendar.YEAR);
-        //idMesC = EPeriodoMesType.values()[Calendar.getInstance().get(Calendar.MONTH)];
-        //idDiaC = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-        
         inAteCD = false;
-        
         dtPeriodoD = Calendar.getInstance().getTime();
-        //idAnoD = Calendar.getInstance().get(Calendar.YEAR);
-        //idMesD = EPeriodoMesType.values()[Calendar.getInstance().get(Calendar.MONTH)];
-        //idDiaD = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
     }
 
     public List<EPeriodoType> getListaIdPeriodo() {
@@ -82,14 +58,6 @@ public class PeriodoBean implements Serializable{
     public void setListaIdPeriodo(List<EPeriodoType> listaIdPeriodo) {
         this.listaIdPeriodo = listaIdPeriodo;
     }
-
-    /*public List<Integer> getListaIdDia() {
-        return this.listaIdDia;
-    }
-
-    public void setListaIdDia(List<Integer> listaIdDia) {
-        this.listaIdDia = listaIdDia;
-    }*/
 
     public List<EPeriodoMesType> getListaIdMes() {
         return this.listaIdMes;

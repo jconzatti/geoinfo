@@ -509,7 +509,9 @@ public class MapBuilderBean implements Serializable{
                     sbuffer.append(",\n");
                     sbuffer.append("    source: new ol.source.Vector({\n");
                     sbuffer.append("        format: new ol.format.GeoJSON(),\n");
-                    sbuffer.append("        url: \"/geoinfo/faces/javax.faces.resource/data/"); 
+                    sbuffer.append("        url: \""); 
+                    sbuffer.append(FacesContext.getCurrentInstance().getExternalContext().getApplicationContextPath());
+                    sbuffer.append("/faces/javax.faces.resource/data/"); 
                     sbuffer.append(rgps.getDsGeoJSON()); 
                     sbuffer.append("\"\n");
                     sbuffer.append("    }),\n");
