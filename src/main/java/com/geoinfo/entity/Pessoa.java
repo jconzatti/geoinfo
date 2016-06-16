@@ -73,7 +73,7 @@ public abstract class Pessoa implements Serializable, IGroupable, IRepositorable
         this.gerente = gerente;
     }
     
-    public Boolean isGerente() {
+    public Boolean getInGerente() {
         return getGerente().equals(this);
     }
     
