@@ -18,16 +18,6 @@ public class PessoaLoginBean implements Serializable{
     private String dsUsuario;
     private String dsSenha;
 
-    public String home(){
-        FacesContext fc = FacesContext.getCurrentInstance();
-        ExternalContext ec = fc.getExternalContext();
-        HttpSession hs = (HttpSession) ec.getSession(false);
-        Pessoa pessoaLogada = (Pessoa) hs.getAttribute("pessoaLogada");
-        if(pessoaLogada != null)
-            return "geoinfo";
-        return "index";
-    }
-
     public String login(){
         FacesContext fc = FacesContext.getCurrentInstance();
         ExternalContext ec = fc.getExternalContext();

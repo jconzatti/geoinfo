@@ -56,7 +56,9 @@
             <p:menuitem value="INICIO" 
                         icon="ui-icon-home" 
                         styleClass="menuitem"
-                        action="#{pessoaLoginBean.home()}"/>
+                        action="#{mapBuilderBean.home()}"
+                        actionListener="#{layoutViewBean.reiniciar()}"
+                        ajax="false"/>
             <p:menuitem value="CONTATO" 
                         icon="ui-icon-mail-closed" 
                         styleClass="menuitem"/>
@@ -78,7 +80,8 @@
                     <h:outputText value="Olá #{sessionScope.pessoaLogada.dsPessoa}!"/>
                     <h:commandLink id="linkLogoff"
                                    value="Sair" 
-                                   action="#{pessoaLoginBean.logoff()}"/>
+                                   action="#{pessoaLoginBean.logoff()}"
+                                   actionListener="#{layoutViewBean.reiniciar()}"/>
                 </h:panelGrid>
             </f:facet>
         </p:menubar>

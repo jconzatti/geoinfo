@@ -13,12 +13,27 @@
     <h:body>
         <h:outputStylesheet name="template.css" library="css"/>
         
+        <h:outputScript>
+            var inFilterGeoinfoColapsed = false;
+            var inAnalizeGeoinfoColapsed = true;
+            var inAnalizeGeoinfoVisible = false;
+        </h:outputScript>
+        
+        <h:form id="form-script-layout">
+            <h:outputScript>
+                #{layoutViewBean.dsOutputScriptLayout}
+            </h:outputScript>
+        </h:form>
+        
         <h:form id="form-message">
             <p:growl id="growl-message"/>
         </h:form>
         
         <p:layout fullPage="true" 
                   widgetVar="layoutPage">
+            <p:ajax event="toggle" 
+                    listener="#{layoutViewBean.handleToggle}"
+                    update=":form-script-layout"/>
             <p:layoutUnit position="north"
                           size="52">
                 <ui:insert name="menu-geoinfo"/>     

@@ -13,9 +13,18 @@
             }else if(data.status === "success"){
                 PF('dlgMapLoad').hide();
                 if(inProcessMap){
-                    PF('layoutPage').toggle('west');
-                    PF('layoutPage').show('east');
-                    PF('layoutPage').toggle('east');
+                    if(!inFilterGeoinfoColapsed){
+                        PF('layoutPage').toggle('west');
+                        inFilterGeoinfoColapsed = true;
+                    }
+                    if(!inAnalizeGeoinfoVisible){
+                        PF('layoutPage').show('east');
+                        inAnalizeGeoinfoVisible = true;
+                    }
+                    if(inAnalizeGeoinfoColapsed){
+                        PF('layoutPage').toggle('east');
+                        inAnalizeGeoinfoColapsed = false;
+                    }
                 }
                 if(inPollImportDataIniciado){
                     PF('pollImportDataGeoInfo').start();

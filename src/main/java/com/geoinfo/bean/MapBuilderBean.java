@@ -54,19 +54,23 @@ public class MapBuilderBean implements Serializable{
     private List<Cidade> listaCidade;
     
     public MapBuilderBean(){
-        dsOutputScriptMap = getMapaPadrao();
+        inicializar();
+    }
+    
+    private void inicializar(){
+        this.dsOutputScriptMap = getMapaPadrao();
         
-        pcProgresso = new Long(0);
-        idProgressoPais = new Long(0);
-        idProgressoEstado = new Long(0);
-        idProgressoCidade = new Long(0);
-        legendaPais = null;
-        legendaEstado = null;
-        legendaCidade = null;
-        listaObjetoFatoPais = null;
-        listaObjetoFatoEstado = null;
-        listaObjetoFatoCidade = null;
-        dsTitulo = null;
+        this.pcProgresso = new Long(0);
+        this.idProgressoPais = new Long(0);
+        this.idProgressoEstado = new Long(0);
+        this.idProgressoCidade = new Long(0);
+        this.legendaPais = null;
+        this.legendaEstado = null;
+        this.legendaCidade = null;
+        this.listaObjetoFatoPais = null;
+        this.listaObjetoFatoEstado = null;
+        this.listaObjetoFatoCidade = null;
+        this.dsTitulo = null;
     }
     
     private String getMapaPadrao(){
@@ -165,6 +169,24 @@ public class MapBuilderBean implements Serializable{
                "    return false;\n" +
                "};";
     }
+
+    public String home(){
+        inicializar();
+        
+        FacesContext fc = FacesContext.getCurrentInstance();
+        ExternalContext ec = fc.getExternalContext();
+        HttpSession hs = (HttpSession) ec.getSession(false);
+        Pessoa pessoaLogada = (Pessoa) hs.getAttribute("pessoaLogada");
+        if(hs.getAttribute("listaFato") != null){
+            hs.removeAttribute("listaFato");
+        }
+        if(hs.getAttribute("periodoIntervaloComparavel") != null){
+            hs.removeAttribute("periodoIntervaloComparavel");
+        }
+        if(pessoaLogada != null)
+            return "geoinfo";
+        return "index";
+    }
     
     public void processar(){
         pcProgresso = new Long(0);
@@ -220,6 +242,10 @@ public class MapBuilderBean implements Serializable{
                 this.dsOutputScriptMap += "document.getElementById(\"form-map:panel-titulo-map\").style.height = \"30px\";";
                 this.dsOutputScriptMap += "document.getElementById(\"map\").style.height = \"calc(100% - 35px)\";";
                 
+                pcProgresso = new Long(0);
+                idProgressoPais = new Long(0);
+                idProgressoEstado = new Long(0);
+                idProgressoCidade = new Long(0);
             }catch (ObjetoFatoBuilderException ofbe){
                 FacesMessage fm = new FacesMessage(ofbe.getMessage());
                 fm.setSeverity(FacesMessage.SEVERITY_ERROR);
