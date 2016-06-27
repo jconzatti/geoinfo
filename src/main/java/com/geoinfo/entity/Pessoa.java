@@ -3,6 +3,9 @@ package com.geoinfo.entity;
 import com.geoinfo.util.IGroupable;
 import com.geoinfo.util.IRepositorable;
 import java.io.Serializable;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -103,6 +106,10 @@ public abstract class Pessoa implements Serializable, IGroupable, IRepositorable
     @Override
     public String getDsCodigo() {
         return this.getCdPessoa().toString();
+    }
+    
+    public static String encriptDsSenha(String dsSenha) throws NoSuchAlgorithmException{
+        return new BigInteger(1, MessageDigest.getInstance("MD5").digest(MessageDigest.getInstance("SHA-256").digest(dsSenha.getBytes()))).toString();
     }
     
 }

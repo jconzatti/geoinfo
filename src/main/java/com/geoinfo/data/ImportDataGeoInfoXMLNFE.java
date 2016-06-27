@@ -828,6 +828,53 @@ public class ImportDataGeoInfoXMLNFE extends ImportDataGeoInfo{
                     }
                 }
             }
+        } else if(eRoot.getName().equals("procCancNFe")){
+            Element eNFe = getChildElement(eRoot, "retCancNFe");
+            if(eNFe!=null)
+                eNFe = getChildElement(eNFe, "infCanc");
+            
+            if(eNFe!=null){
+                int idAmbiente = 0;
+                int cdStatus = 0;
+                Long cdVenda = null;
+                String cdExternoEmit = null;
+                Iterator i =  eNFe.getChildren().iterator();
+                while(i.hasNext()){
+                    Element e = (Element)i.next();
+                    String dsNome = e.getName();
+                    if(dsNome.equals("tpAmb")){
+                        idAmbiente = Integer.parseInt(e.getText());
+                    }else if(dsNome.equals("chNFe")){
+                        cdVenda = Long.parseLong(e.getText().substring(20, 34));
+                        cdExternoEmit = e.getText().substring(6, 20);
+                    }else if(dsNome.equals("cStat")){
+                        cdStatus = Integer.parseInt(e.getText());
+                    }
+                }
+                
+                if(cdStatus == 101){
+                    if((idAmbiente == 1)||(inImportarHomologacao)){
+                        if(cdVenda != null){
+                            if(cdExternoEmit != null){
+                                EstabelecimentoRepository estabelecimentoRepository = new EstabelecimentoRepository(this.getEntityManager());
+                                Estabelecimento estabelecimento = estabelecimentoRepository.find(this.getGerente(), cdExternoEmit);
+                                if(estabelecimento != null){
+                                    VendaPK vendaPK = new VendaPK();
+                                    vendaPK.setCdVenda(cdVenda);
+                                    vendaPK.setEstabelecimento(estabelecimento);
+                                    
+                                    VendaRepository vendaRepository = new VendaRepository(this.getEntityManager());
+                                    Venda venda = vendaRepository.find(vendaPK);
+                                    if(venda != null){
+                                        venda.setIdStatus((short)1);
+                                        vendaRepository.edit(venda);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         return false;
     }

@@ -2,6 +2,9 @@ package com.geoinfo.repository;
 
 import com.geoinfo.entity.Pessoa;
 import com.geoinfo.entity.PessoaMaster;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -33,14 +36,17 @@ public abstract class PessoaRepository<K extends Pessoa> extends Repository<K, L
     }
     
     public K find(String dsUsuario, String dsSenha){
-        Query query = this.manager.createQuery("select p from " + getClassEntityName() + " p where "
-                + "p.dsUsuario = :dsUsuario and p.dsSenha = :dsSenha").
-                setParameter("dsUsuario", dsUsuario).setParameter("dsSenha", dsSenha);
-        List<Pessoa> listaPessoa = query.getResultList();
-        if (listaPessoa.isEmpty())
-            return null;
-        else
-            return (K) listaPessoa.get(0);
+        try {
+            String dsSenhaMD5 = Pessoa.encriptDsSenha(dsSenha);
+            
+            Query query = this.manager.createQuery("select p from " + getClassEntityName() + " p where "
+                    + "p.dsUsuario = :dsUsuario and p.dsSenha = :dsSenha").
+                    setParameter("dsUsuario", dsUsuario).setParameter("dsSenha", dsSenhaMD5);
+            List<Pessoa> listaPessoa = query.getResultList();
+            if (!listaPessoa.isEmpty())
+                return (K) listaPessoa.get(0);
+        } catch (NoSuchAlgorithmException ex) { }
+        return null;
     }
     
     
