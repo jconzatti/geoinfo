@@ -61,10 +61,12 @@
                         ajax="false"/>
             <p:menuitem value="CONTATO" 
                         icon="ui-icon-mail-closed" 
-                        styleClass="menuitem"/>
+                        styleClass="menuitem"
+                        onclick="PF('dlgContato').show();"/>
             <p:menuitem value="SOBRE" 
                         icon="ui-icon-comment" 
-                        styleClass="menuitem"/>
+                        styleClass="menuitem"
+                        onclick="PF('dlgSobre').show();"/>
             <p:menuitem value="IMPORTAR DADOS"
                         styleClass="menuitem"
                         onclick="PF('dlgImportData').show();"
@@ -109,6 +111,62 @@
                                action="#{pessoaLoginBean.login()}"/>
             </h:panelGrid>
         </p:panel>
+        
+        <p:dialog header="Contato"
+                  widgetVar="dlgContato"
+                  appendTo="@(body)"
+                  modal="true">
+            <h:panelGrid columns="1">
+                <h:outputLabel value="Entre em contato para adquirir um usuário e senha!"/>
+                <h:outputLabel value="Desenvolvedor: Jhoni Conzatti"/>
+                <h:outputLabel value="Telefone: (47)8452-7792"/>
+                <h:outputLabel value="e-mail: jhoni.conzatti@gmail.com"/>
+            </h:panelGrid>
+        </p:dialog>
+        
+        <p:dialog header="Sobre"
+                  widgetVar="dlgSobre"
+                  appendTo="@(body)"
+                  modal="true">
+            <h:panelGrid columns="1">
+                <h:outputLabel value="Use o GeoInfo para importar informações de seu ERP"/>
+                <h:outputLabel value="ou de suas NF-es para poder vê-las em formato geográfico!"/>
+                <h:outputLabel value="Compare quanto vendeu em diferentes períodos, veja onde"/>
+                <h:outputLabel value="estão seus clientes! Descubra seu potencial!"/>
+                <h:inputHidden/>
+                <h:outputLabel value="Tecnologia usada: "/>
+                <h:panelGroup>
+                    <h:outputLink value="http://www.java.com/"
+                                  target="_new">
+                        <h:outputText value="Java"/>
+                    </h:outputLink>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <h:outputLink value="https://javaserverfaces.java.net/"
+                                  target="_new">
+                        <h:outputText value="JSF 2.1"/>
+                    </h:outputLink>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <h:outputLink value="http://hibernate.org/"
+                                  target="_new">
+                        <h:outputText value="Hibernate 3.2"/>
+                    </h:outputLink>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <h:outputLink value="http://www.primefaces.org/"
+                                  target="_new">
+                        <h:outputText value="Primefaces 5.3"/>
+                    </h:outputLink>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <h:outputLink value="http://openlayers.org/"
+                                  target="_new">
+                        <h:outputText value="OpenLayers 3.16.0"/>
+                    </h:outputLink>
+                </h:panelGroup>
+            </h:panelGrid>
+        </p:dialog>
         
         <p:poll autoStart="false" 
                 interval="1" 
