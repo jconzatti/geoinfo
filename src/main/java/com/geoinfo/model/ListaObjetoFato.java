@@ -7,6 +7,7 @@ import com.geoinfo.entity.Pessoa;
 import com.geoinfo.entity.Vendedor;
 import com.geoinfo.exception.ObjetoFatoBuilderException;
 import com.geoinfo.factory.EObjetoFatoGroupByFactory;
+import com.geoinfo.repository.VendedorRepository;
 import com.geoinfo.util.EObjetoFatoGroupBy;
 import com.geoinfo.util.IGroupable;
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class ListaObjetoFato<T extends IGroupable> {
             Pessoa pessoaLogada){
         StringBuffer sbufferHQL = new StringBuffer();
         sbufferHQL.append("select ");
-        String dsGroupBy = "group by ";
+        String dsGroupBy = " group by ";
         switch(idObjetoFatoGroupBy){
             case GROUP_BY_CIDADE:
                 sbufferHQL.append("ci, ");
@@ -165,21 +166,35 @@ public class ListaObjetoFato<T extends IGroupable> {
             }
             sbufferHQL.append(" and v.idStatus = 0");
             if(pessoaLogada.getInGerente()){
-                sbufferHQL.append(" and v.estabelecimento.gerente.cdPessoa = :cdPessoa"); 
+                sbufferHQL.append(" and v.vendaPK.estabelecimento.gerente.cdPessoa = "); 
+                sbufferHQL.append(pessoaLogada.getCdPessoa());
             }else{
                 if(pessoaLogada instanceof Estabelecimento){
-                    sbufferHQL.append(" and v.estabelecimento.cdPessoa = :cdPessoa"); 
+                    sbufferHQL.append(" and v.vendaPK.estabelecimento.cdPessoa = "); 
+                    sbufferHQL.append(pessoaLogada.getCdPessoa());
                 }else if(pessoaLogada instanceof Cliente){
-                    sbufferHQL.append(" and v.cliente.cdPessoa = :cdPessoa"); 
+                    sbufferHQL.append(" and v.cliente.cdPessoa = "); 
+                    sbufferHQL.append(pessoaLogada.getCdPessoa());
                 }else if(pessoaLogada instanceof Vendedor){
-                    sbufferHQL.append(" and vv.vendedor.cdPessoa = :cdPessoa"); 
+                    sbufferHQL.append(" and ("); 
+                    VendedorRepository vendedorRepository = new VendedorRepository(entityManager);
+                    List<Vendedor> listaVendedor = vendedorRepository.getListaSubVendedor((Vendedor)pessoaLogada);
+                    int qtVendedor = 0;
+                    for(Vendedor vendedor : listaVendedor){
+                        qtVendedor++;
+                        sbufferHQL.append("vv.vendedor.cdPessoa = "); 
+                        sbufferHQL.append(vendedor.getCdPessoa());
+                        if(qtVendedor < listaVendedor.size())
+                            sbufferHQL.append(" or "); 
+                    }
+                    sbufferHQL.append(")"); 
                 }
             }
         }
         sbufferHQL.append(dsGroupBy);
         String dsSelect = sbufferHQL.toString();
         
-        Query query = entityManager.createQuery(dsSelect).setParameter("cdPessoa", pessoaLogada.getCdPessoa());
+        Query query = entityManager.createQuery(dsSelect);
         Iterator<Object[]> itObjetoFatoValor = query.getResultList().iterator();
         while(itObjetoFatoValor.hasNext()){
             Object[] oLinha = itObjetoFatoValor.next();

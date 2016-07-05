@@ -2,8 +2,6 @@ package com.geoinfo.repository;
 
 import com.geoinfo.entity.Pessoa;
 import com.geoinfo.entity.PessoaMaster;
-import java.math.BigInteger;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import javax.persistence.EntityManager;
