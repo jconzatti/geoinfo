@@ -1,5 +1,7 @@
 package com.geoinfo.model;
 
-public abstract class RegiaoGeograficaPoligonal extends RegiaoGeografica{
+import com.geoinfo.util.IGroupable;
+
+public abstract class RegiaoGeograficaPoligonal extends RegiaoGeografica implements IGroupable{
     
 }
