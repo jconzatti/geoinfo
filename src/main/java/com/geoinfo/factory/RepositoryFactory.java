@@ -40,6 +40,8 @@ public class RepositoryFactory {
             return new FatoRepository(entityManager);
         }else if (classIRepositorable.getSimpleName().equalsIgnoreCase("LocalizacaoDestinoVenda")){
             return new LocalizacaoDestinoVendaRepository(entityManager);
+        }else if (classIRepositorable.getSimpleName().equalsIgnoreCase("LocalizacaoOrigemVenda")){
+            return new LocalizacaoOrigemVendaRepository(entityManager);
         }
         return null;
     }

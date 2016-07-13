@@ -8,7 +8,7 @@ import java.security.NoSuchAlgorithmException;
 public class MessageDigestTest {
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
-        String dsSenha = "080690";
+        String dsSenha = "@prolife#2016";
         System.out.println("Senha: " + dsSenha);
         String dsSenhaMD5 = new BigInteger(1, MessageDigest.getInstance("MD5").digest(dsSenha.getBytes())).toString();
         System.out.println("Senha MD5: " + dsSenhaMD5);

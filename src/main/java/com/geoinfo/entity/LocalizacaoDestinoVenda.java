@@ -63,12 +63,5 @@ public class LocalizacaoDestinoVenda extends RegiaoGeograficaPontual implements 
     public String toString() {
         return dsEndereco + ", " + dsNumero + " - " + dsBairro + " " + cidade.toString();
     }
-
-    @Override
-    public String getDsCodigo() {
-        return this.getLocalizacaoDestinoVendaPK().getVenda().getDsCodigo();
-    }
-    
-    
     
 }

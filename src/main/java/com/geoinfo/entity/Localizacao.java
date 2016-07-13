@@ -57,12 +57,4 @@ public class Localizacao extends RegiaoGeograficaPontual implements Serializable
         return dsEndereco + ", " + dsNumero + " - " + dsBairro + " " + localizacaoPK.getCidade().toString();
     }
     
-    @Override
-    public String getDsCodigo() {
-        return this.localizacaoPK.getCidade().getCidadePK().getEstado().getEstadoPK().getPais().getCdPais().toString() + "-" +
-                this.localizacaoPK.getCidade().getCidadePK().getEstado().getEstadoPK().getCdEstado().toString() + "-" +
-                this.localizacaoPK.getCidade().getCidadePK().getCdCidade().toString() + "-" +
-                this.localizacaoPK.getPessoa().getCdPessoa().toString();
-    }
-    
 }
