@@ -31,7 +31,7 @@ public abstract class Repository<K,V> {
     
     public void delete(V v){
         K k = this.find(v);
-        this.manager.remove(v);
+        this.manager.remove(k);
     }
     
     public List<K> getList(){

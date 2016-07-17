@@ -13,22 +13,18 @@ import com.geoinfo.model.PeriodoIntervalo;
 import com.geoinfo.model.PeriodoIntervaloComparavel;
 import com.geoinfo.repository.AdministradorRepository;
 import com.geoinfo.repository.FatoRepository;
-import com.geoinfo.util.EPeriodoMesType;
 import com.geoinfo.util.EPeriodoType;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-/**
- *
- * @author Jhoni
- */
 public class RepositoryTest {
     
-    public static void main(String args[]){
+    public static void main(String args[]) throws NamingException{
         EntityManagerFactory  entityManagerFactory = Persistence.createEntityManagerFactory("geoinfo-pu");
         
         EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -43,7 +39,7 @@ public class RepositoryTest {
         Administrador administrador = administradorRepository.find((long)1);
         
         try{
-            PeriodoIntervaloComparavel periodoIntervaloComparavel = PeriodoIntervaloComparavel.create(PeriodoIntervalo.create(EPeriodoType.DATA, 2010, EPeriodoMesType.JAN, 27, 0, null, 0, false), null, false);
+            PeriodoIntervaloComparavel periodoIntervaloComparavel = PeriodoIntervaloComparavel.create(PeriodoIntervalo.create(EPeriodoType.ANO, 2010, null, 0, 0, null, 0, false), null, false);
 
             ListaObjetoFato<Cidade> objetoFatoBuilderCidade = ListaObjetoFato.create(listaFato, periodoIntervaloComparavel, entityManager, Cidade.class, administrador);
 

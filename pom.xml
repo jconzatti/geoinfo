@@ -18,12 +18,12 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>5.2.1.Final</version>
+            <version>4.2.21.Final</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>ejb3-persistence</artifactId>
-            <version>1.0.2.GA</version>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>4.2.21.Final</version>
         </dependency>
         <dependency>
             <groupId>javax.sql</groupId>
@@ -50,11 +50,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.10</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging</artifactId>
-            <version>3.2.0.Final</version>
         </dependency>
         <dependency>
             <groupId>com.sun.faces</groupId>
@@ -85,7 +80,7 @@
         <dependency>
             <groupId>org.firebirdsql.jdbc</groupId>
             <artifactId>jaybird</artifactId>
-            <version>2.1.6</version>
+            <version>2.2.5</version>
             <exclusions>
                 <exclusion>
                     <artifactId>jms</artifactId>

@@ -868,6 +868,70 @@ public class ImportDataGeoInfoXMLNFE extends ImportDataGeoInfo{
                                     if(venda != null){
                                         venda.setIdStatus((short)1);
                                         vendaRepository.edit(venda);
+                                    } else {
+                                        venda = new Venda();
+                                        venda.setVendaPK(vendaPK);
+                                        venda.setIdStatus((short)1);
+                                        vendaRepository.insert(venda);
+                                    }
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else if((eRoot.getName().equals("procEventoNFe"))){
+            Element eNFe = getChildElement(eRoot, "retEvento");
+            if(eNFe!=null)
+                eNFe = getChildElement(eNFe, "infEvento");
+            
+            if(eNFe!=null){
+                int idAmbiente = 0;
+                int cdStatus = 0;
+                Long cdVenda = null;
+                String cdExternoEmit = null;
+                Long cdEvento = null;
+                Iterator i =  eNFe.getChildren().iterator();
+                while(i.hasNext()){
+                    Element e = (Element)i.next();
+                    String dsNome = e.getName();
+                    if(dsNome.equals("tpAmb")){
+                        idAmbiente = Integer.parseInt(e.getText());
+                    }else if(dsNome.equals("chNFe")){
+                        cdVenda = Long.parseLong(e.getText().substring(20, 34));
+                        cdExternoEmit = e.getText().substring(6, 20);
+                    }else if(dsNome.equals("cStat")){
+                        cdStatus = Integer.parseInt(e.getText());
+                    }else if(dsNome.equals("tpEvento")){
+                        cdEvento = Long.parseLong(e.getText());
+                    }
+                }
+                
+                if(cdStatus == 135){
+                    if((idAmbiente == 1)||(inImportarHomologacao)){
+                        if(cdVenda != null){
+                            if(cdExternoEmit != null){
+                                if((cdEvento != null)&&(cdEvento == 110111)){
+                                    EstabelecimentoRepository estabelecimentoRepository = new EstabelecimentoRepository(this.getEntityManager());
+                                    Estabelecimento estabelecimento = estabelecimentoRepository.find(this.getGerente(), cdExternoEmit);
+                                    if(estabelecimento != null){
+                                        VendaPK vendaPK = new VendaPK();
+                                        vendaPK.setCdVenda(cdVenda);
+                                        vendaPK.setEstabelecimento(estabelecimento);
+
+                                        VendaRepository vendaRepository = new VendaRepository(this.getEntityManager());
+                                        Venda venda = vendaRepository.find(vendaPK);
+                                        if(venda != null){
+                                            venda.setIdStatus((short)1);
+                                            vendaRepository.edit(venda);
+                                        } else {
+                                            venda = new Venda();
+                                            venda.setVendaPK(vendaPK);
+                                            venda.setIdStatus((short)1);
+                                            vendaRepository.insert(venda);
+                                        }
+                                        return true;
                                     }
                                 }
                             }

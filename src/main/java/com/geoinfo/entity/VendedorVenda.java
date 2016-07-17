@@ -6,10 +6,6 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
-/**
- *
- * @author Jhoni
- */
 @Entity
 public class VendedorVenda implements Serializable, IRepositorable {
     @EmbeddedId

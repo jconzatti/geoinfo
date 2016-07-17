@@ -11,10 +11,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-/**
- *
- * @author Jhoni
- */
 @Entity
 public class Venda implements Serializable, IGroupable, IRepositorable {
     @EmbeddedId

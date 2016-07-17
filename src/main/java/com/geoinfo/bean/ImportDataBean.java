@@ -209,8 +209,6 @@ public class ImportDataBean implements Serializable{
                                                         long qtLinha = bufferedReader.lines().count();
                                                         bufferedReader.close();
                                                         
-                                                        entityManager.getTransaction().begin();
-                                                        
                                                         bufferedReader = new BufferedReader(new InputStreamReader(zipFile.getInputStream(ze)));
                                                         while(((dsLinha = bufferedReader.readLine()) != null)&&(!inErroCommit)&&(!this.inFechouImportacao)){
                                                             nrLinha++;
@@ -221,12 +219,14 @@ public class ImportDataBean implements Serializable{
                                                             double vlProgresso = ((double)nrRegistroAtual/(double)nrRegistroTotal);
                                                             this.pcProgresso = Math.round((vlProgresso) * 100);
                                                             
+                                                            if(!entityManager.getTransaction().isActive())
+                                                                entityManager.getTransaction().begin();
+                                                            
                                                             importDataGeoInfoCSV.importar(nrLinha, dsLinha, qtLinha == nrLinha);
 
                                                             if((nrRegistroAtual % 1000) == 0){
                                                                 try{
                                                                     entityManager.getTransaction().commit();
-                                                                    entityManager.getTransaction().begin();
                                                                 }catch(Exception ex){
                                                                     inErroCommit = true;
                                                                     entityManager.getTransaction().rollback();
@@ -243,25 +243,27 @@ public class ImportDataBean implements Serializable{
                                                         bufferedReader.close();
 
                                                         if(!inErroCommit){
-                                                            try{
-                                                                entityManager.getTransaction().commit();
+                                                            if(entityManager.getTransaction().isActive()){
+                                                                try{
+                                                                    entityManager.getTransaction().commit();
 
-                                                                if(this.inFechouImportacao){
-                                                                    this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, "Importação de dados finalizada pelo usuário!"));
+                                                                    if(this.inFechouImportacao){
+                                                                        this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, "Importação de dados finalizada pelo usuário!"));
 
-                                                                    FacesMessage fm = new FacesMessage("Importação de dados finalizada pelo usuário!");
-                                                                    fm.setSeverity(FacesMessage.SEVERITY_WARN);
+                                                                        FacesMessage fm = new FacesMessage("Importação de dados finalizada pelo usuário!");
+                                                                        fm.setSeverity(FacesMessage.SEVERITY_WARN);
+                                                                        fc.addMessage(null, fm);
+                                                                    }
+                                                                }catch(Exception ex){
+                                                                    inErroCommit = true;
+                                                                    entityManager.getTransaction().rollback();
+
+                                                                    this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, "Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage()));
+
+                                                                    FacesMessage fm = new FacesMessage("Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage());
+                                                                    fm.setSeverity(FacesMessage.SEVERITY_ERROR);
                                                                     fc.addMessage(null, fm);
                                                                 }
-                                                            }catch(Exception ex){
-                                                                inErroCommit = true;
-                                                                entityManager.getTransaction().rollback();
-
-                                                                this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, "Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage()));
-
-                                                                FacesMessage fm = new FacesMessage("Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage());
-                                                                fm.setSeverity(FacesMessage.SEVERITY_ERROR);
-                                                                fc.addMessage(null, fm);
                                                             }
                                                         }
 
@@ -281,12 +283,10 @@ public class ImportDataBean implements Serializable{
                                                 ImportDataGeoInfoXMLNFE importDataGeoInfoXMLNFE = new ImportDataGeoInfoXMLNFE(entityManager, pessoaGerente);
                                                 importDataGeoInfoXMLNFE.setListaGeoInfoLogNode(listaGeoInfoLogNode);
 
-                                                Long nrArquivo = (long) 0;
                                                 itZE = listaZEXMLNFE.iterator();
                                                 while((itZE.hasNext())&&(!inErroCommit)&&(!this.inFechouImportacao)){
                                                     ZipEntry ze = (ZipEntry)itZE.next();
 
-                                                    nrArquivo++;
                                                     nrRegistroAtual++;
 
                                                     String dsArquivo = ze.getName();
@@ -298,25 +298,22 @@ public class ImportDataBean implements Serializable{
                                                     this.pcProgresso = Math.round((vlProgresso) * 100);
 
                                                     try {
-                                                        entityManager.getTransaction().begin();
+                                                        if(!entityManager.getTransaction().isActive())
+                                                            entityManager.getTransaction().begin();
 
                                                         importDataGeoInfoXMLNFE.importar(zipFile.getInputStream(ze), true);
 
-                                                        if((nrArquivo % 50) == 0){
-                                                            try{
-                                                                entityManager.getTransaction().commit();
-                                                                entityManager.getTransaction().begin();
-                                                            }catch(Exception ex){
-                                                                inErroCommit = true;
-                                                                entityManager.getTransaction().rollback();
+                                                        try{
+                                                            entityManager.getTransaction().commit();
+                                                        }catch(Exception ex){
+                                                            inErroCommit = true;
+                                                            entityManager.getTransaction().rollback();
 
-                                                                this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, "Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage()));
+                                                            this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, "Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage()));
 
-                                                                FacesMessage fm = new FacesMessage("Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage());
-                                                                fm.setSeverity(FacesMessage.SEVERITY_INFO);
-                                                                fc.addMessage(null, fm);
-                                                            }
-
+                                                            FacesMessage fm = new FacesMessage("Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage());
+                                                            fm.setSeverity(FacesMessage.SEVERITY_INFO);
+                                                            fc.addMessage(null, fm);
                                                         }
 
                                                     } catch (IOException ex) {
@@ -331,25 +328,27 @@ public class ImportDataBean implements Serializable{
                                                 }
 
                                                 if(!inErroCommit){
-                                                    try{
-                                                        entityManager.getTransaction().commit();
+                                                    if(entityManager.getTransaction().isActive()){
+                                                        try{
+                                                            entityManager.getTransaction().commit();
 
-                                                        if(this.inFechouImportacao){
-                                                            this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, "Importação de dados finalizada pelo usuário!"));
+                                                            if(this.inFechouImportacao){
+                                                                this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_WARN, "Importação de dados finalizada pelo usuário!"));
 
-                                                            FacesMessage fm = new FacesMessage("Importação de dados finalizada pelo usuário!");
-                                                            fm.setSeverity(FacesMessage.SEVERITY_WARN);
+                                                                FacesMessage fm = new FacesMessage("Importação de dados finalizada pelo usuário!");
+                                                                fm.setSeverity(FacesMessage.SEVERITY_WARN);
+                                                                fc.addMessage(null, fm);
+                                                            }
+                                                        }catch(Exception ex){
+                                                            inErroCommit = true;
+                                                            entityManager.getTransaction().rollback();
+
+                                                            this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, "Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage()));
+
+                                                            FacesMessage fm = new FacesMessage("Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage());
+                                                            fm.setSeverity(FacesMessage.SEVERITY_ERROR);
                                                             fc.addMessage(null, fm);
                                                         }
-                                                    }catch(Exception ex){
-                                                        inErroCommit = true;
-                                                        entityManager.getTransaction().rollback();
-
-                                                        this.listaGeoInfoLogNode.add(new GeoInfoLogNode(EGeoInfoLogType.LOG_ERROR, "Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage()));
-
-                                                        FacesMessage fm = new FacesMessage("Erro ao efetivar gravação dos registros no banco de dados! " + ex.getMessage());
-                                                        fm.setSeverity(FacesMessage.SEVERITY_ERROR);
-                                                        fc.addMessage(null, fm);
                                                     }
                                                 }
                                             }

@@ -10,7 +10,9 @@
         function onProcessMap(data){
             if(data.status === "begin"){
                 PF('dlgMapLoad').show();
+                PF('pollMapLoad').start();
             }else if(data.status === "success"){
+                PF('pollMapLoad').stop();
                 PF('dlgMapLoad').hide();
                 if(inProcessMap){
                     if(!inFilterGeoinfoColapsed){
@@ -69,6 +71,11 @@
                     render=":form-script-map :form-map :form-menu :form-analize :form-legenda :form-message:growl-message :form-map-load" 
                     onevent="onProcessMap"/>
         </p:commandButton>
+        
+        <p:poll autoStart="false"
+                interval="1" 
+                update=":form-map-load:pgrid-map-load :form-map-load:pbar-map-load" 
+                widgetVar="pollMapLoad"/>
     </h:form>
     
     <h:form id="form-map-load">
@@ -77,13 +84,7 @@
                   closable="false"
                   modal="true"
                   widgetVar="dlgMapLoad"
-                  header="Carregando informações do Mapa. Aguarde!"
-                  onShow="PF('pollMapLoad').start();"
-                  onHide="PF('pollMapLoad').stop();">
-            <p:poll autoStart="false" 
-                    interval="1" 
-                    update=":form-map-load:pbar-map-load :form-map-load:pgrid-map-load" 
-                    widgetVar="pollMapLoad"/>
+                  header="Carregando informações do Mapa. Aguarde!">
             <h:panelGrid columns="2" 
                          id="pgrid-map-load">
                 <h:panelGroup>
